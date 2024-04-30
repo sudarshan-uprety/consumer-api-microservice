@@ -7,11 +7,11 @@ from app import schemas, api
 
 router = APIRouter(
     prefix="/accounts",
-    tags=['accounts']
+    tags=['verify_accounts'],
 )
 
 
-@router.post('/verify/user/{token}', status_code=status.HTTP_200_OK)
+@router.get('/verify/user/{token}', status_code=status.HTTP_200_OK)
 async def verify_email(token: str = Path(..., description="Verification token"), db: Session = Depends(get_db)):
     try:
         verify = await api.verify_user_email_api(token=token, db=db)

@@ -18,3 +18,9 @@ JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY")
 JWT_REFRESH_SECRET_KEY = os.getenv("JWT_REFRESH_SECRET_KEY")
 
 ROOT_URL = os.getenv("ROOT_URL")
+
+MAIL_USERNAME = os.getenv('MAIL_USERNAME')
+MAIL_FROM = os.getenv('MAIL_USERNAME')
+MAIL_PASSWORD = os.getenv('MAIL_PASSWORD')
+MAIL_PORT = int(os.getenv('MAIL_PORT'))
+MAIL_SERVER = os.getenv('MAIL_SERVER')

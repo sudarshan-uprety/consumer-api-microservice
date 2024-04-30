@@ -7,14 +7,14 @@ from app.utils.jwt_token import create_refresh_token, create_access_token
 
 router = APIRouter(
     prefix="/accounts",
-    tags=['accounts']
+    tags=['logins']
 )
 
 
 @router.post('/login', status_code=status.HTTP_200_OK, response_model=schemas.LoginResponse)
 async def login(user_in: schemas.UserLogin, db: Session = Depends(get_db)):
     try:
-        user = api.login_user_api(user_in.email, db=db)
+        user = await api.login_user_api(user_in.email, db=db)
         return user
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))

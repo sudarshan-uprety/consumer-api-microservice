@@ -3,14 +3,14 @@ from starlette.responses import JSONResponse
 
 from app.utils.templates import templates
 from app.models import User
-from app.utils.settings import ROOT_URL
+from app.utils.settings import *
 
 conf = ConnectionConfig(
-   MAIL_USERNAME='mr.sudarshanuprety@gmail.com',
-   MAIL_FROM='mr.sudarshanuprety@gmail.com',
-   MAIL_PASSWORD="bujsppzcatxdqvnu",
-   MAIL_PORT=587,
-   MAIL_SERVER="smtp.gmail.com",
+   MAIL_USERNAME=MAIL_USERNAME,
+   MAIL_FROM=MAIL_FROM,
+   MAIL_PASSWORD=MAIL_PASSWORD,
+   MAIL_PORT=MAIL_PORT,
+   MAIL_SERVER=MAIL_SERVER,
    MAIL_STARTTLS=True,
    MAIL_SSL_TLS=False
 )

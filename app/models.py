@@ -1,3 +1,4 @@
+from datetime import datetime
 from sqlalchemy import (
     LargeBinary,
     Column,
@@ -33,3 +34,12 @@ class User(Base, Common):
 
     UniqueConstraint("email", name="uq_user_email")
     PrimaryKeyConstraint("id", name="pk_user_id")
+
+
+class UsedToken(Base):
+    __tablename__ = "used_tokens"
+
+    id = Column(Integer, primary_key=True, index=True)
+    token = Column(String, unique=True, index=True)
+    created_at = Column(DateTime, default=datetime.utcnow())
+    used_at = Column(DateTime)

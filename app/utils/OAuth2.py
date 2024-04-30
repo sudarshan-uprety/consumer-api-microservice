@@ -11,7 +11,6 @@ from app.schemas import TokenPayload, SystemUser
 from app.database.database import get_db
 from app import models
 
-
 reuseable_oauth = OAuth2PasswordBearer(
     tokenUrl="/login",
     scheme_name="JWT"

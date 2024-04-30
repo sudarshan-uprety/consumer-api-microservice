@@ -11,7 +11,9 @@ from app.utils.settings import JWT_REFRESH_SECRET_KEY, ALGORITHM
 def get_user_or_404(email: str) -> models.User:
     with SessionLocal() as db:
         user = db.query(models.User).filter(models.User.email == email).first()
-    if user:
+    if user.is_active == False:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="User not verified to login.")
+    elif user:
         return user
     else:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
@@ -45,3 +47,15 @@ def verify_refresh_token(refresh_token: str) -> str:
         return payload.get('sub')
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid refresh token")
+
+
+def check_used_token(token: str) -> bool:
+    try:
+        with SessionLocal() as db:
+            token = db.query(models.UsedToken).filter(models.UsedToken.token == token).first()
+            if token:
+                raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Token already used.")
+            else:
+                return False
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
