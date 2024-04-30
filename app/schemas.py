@@ -1,4 +1,4 @@
-from datetime import datetime
+from typing import List
 
 from pydantic import BaseModel, EmailStr, root_validator
 from fastapi import HTTPException, status
@@ -73,3 +73,12 @@ class RefreshTokenRequest(BaseModel):
 class TokenResponse(BaseModel):
     access_token: str
     refresh_token: str
+
+
+class EmailSchema(BaseModel):
+    email: EmailStr
+
+    @root_validator(pre=True)
+    def validate(cls, field_values):
+        user = get_user_or_404(field_values['email'])
+        return field_values

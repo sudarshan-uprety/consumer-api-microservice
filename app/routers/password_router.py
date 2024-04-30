@@ -1,17 +1,24 @@
-from fastapi import FastAPI, Response, status, HTTPException, Depends, APIRouter
+from fastapi import Depends, APIRouter, BackgroundTasks
+from sqlalchemy.orm import Session
 
 from app.models import User
-from app.OAuth2 import get_current_user
-from app.schemas import UserOut
+from app.utils.OAuth2 import get_current_user
+from app.schemas import EmailSchema
+from app.database.database import get_db
+from app import api
+from app.usecase import get_user_or_404
+
 router = APIRouter(
     prefix="/password",
     tags=['accounts']
 )
 
 
-@router.post('/forget')
-async def forget_password() -> str:
-    # need to create a forget password API with email verification
+@router.post('/forget/password')
+async def forget_password(email: EmailSchema, db: Session = Depends(get_db), background_tasks: BackgroundTasks =
+                          BackgroundTasks()) -> str:
+    # forget password API with email verification
+    api.forgert_password_api(email=email.email, db=db, bg_task=background_tasks)
     return "Hello from login"
 
 
