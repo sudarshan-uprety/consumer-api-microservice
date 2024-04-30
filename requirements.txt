@@ -1,0 +1,14 @@
+alembic==1.13.1
+bcrypt==4.1.2
+environ==1.0
+fastapi==0.110.2
+passlib==1.7.4
+psycopg2-binary==2.9.9
+pyasn1==0.6.0
+pydantic==2.7.1
+pydantic_core==2.18.2
+PyJWT==2.8.0
+python-dotenv==1.0.1
+python-jose==3.3.0
+SQLAlchemy==2.0.29
+uvicorn==0.29.0
