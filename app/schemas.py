@@ -1,11 +1,9 @@
 from datetime import datetime
 
-from pydantic import BaseModel, EmailStr, root_validator
+from pydantic import BaseModel, EmailStr, root_validator, validator, ValidationError
 from fastapi import HTTPException, status
 
-from app.usecase import get_user_or_404, check_user, check_phone
-from app.utils.jwt_token import verify_password
-from app import models
+from app.validation import login_user_verification
 
 
 class UserOut(BaseModel):
@@ -24,26 +22,16 @@ class UserCreate(BaseModel):
     confirm_password: str
     phone: str
 
-    @root_validator(pre=True)
-    def validate(cls, field_values):
-        check_user(field_values['email'])
-        check_phone(field_values['phone'])
-        if field_values['password'] != field_values['confirm_password']:
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Passwords do not match")
-        return field_values
+    @validator('confirm_password')
+    def validate(cls, confirm_password, values):
+        if confirm_password != values["password"]:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Passwords do not match')
+        return values
 
 
 class UserLogin(BaseModel):
     email: EmailStr
     password: str
-
-    @root_validator(pre=True)
-    def validate(cls, field_values) -> models.User:
-        user = get_user_or_404(field_values['email'])
-        if not verify_password(password=field_values['password'], hashed_pass=user.password):
-            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Incorrect Email or Password")
-        else:
-            return user
 
 
 class LoginResponse(BaseModel):
@@ -80,7 +68,7 @@ class EmailSchema(BaseModel):
 
     @root_validator(pre=True)
     def validate(cls, field_values):
-        user = get_user_or_404(field_values['email'])
+        user = login_user_verification(field_values['email'])
         return field_values
 
 
@@ -107,3 +95,4 @@ class UserDetails(BaseModel):
     full_name: str
     email: EmailStr
     created_at: datetime
+    phone: str

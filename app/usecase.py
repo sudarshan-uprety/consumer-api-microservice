@@ -1,61 +1,33 @@
-
-from fastapi import HTTPException, status
 from _datetime import datetime
-from jose import jwt
+from fastapi import HTTPException, status
 
-from app import models
-from app.database.database import SessionLocal
-from app.utils.settings import JWT_REFRESH_SECRET_KEY, ALGORITHM
+from sqlalchemy.orm import Session
 
-
-def get_user_or_404(email: str) -> models.User:
-    with SessionLocal() as db:
-        user = db.query(models.User).filter(models.User.email == email).first()
-    if user.is_active == False:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="User not verified to login.")
-    elif user:
-        return user
-    else:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+from app.models import User
 
 
-def check_user(email: str) -> bool:
-    with SessionLocal() as db:
-        user = db.query(models.User).filter(models.User.email == email).first()
-    if user:
-        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="User already exists")
-    else:
-        return True
+async def get_user_or_404(email: str, db: Session):
+    try:
+        user = db.query(User).filter(User.email == email).first()
+        if user:
+            return user
+        else:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
 
-def check_phone(phone: str) -> bool:
-    with SessionLocal() as db:
-        user = db.query(models.User).filter(models.User.phone == phone).first()
-    if user:
-        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Phone already exists")
-    else:
-        return True
-
-
-def timestamp_to_datetime(timestamp: int) -> datetime:
+async def timestamp_to_datetime(timestamp: int) -> datetime:
     return datetime.fromtimestamp(timestamp)
 
 
-def verify_refresh_token(refresh_token: str) -> str:
+# check if the user is already active
+async def check_user_active(email: str, db: Session) -> User:
     try:
-        payload = jwt.decode(refresh_token, JWT_REFRESH_SECRET_KEY, algorithms=[ALGORITHM])
-        return payload.get('sub')
+        user = db.query(User).filter(User.email == email).first()
+        if user.is_active:
+            raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=f'User {email} already active')
+        else:
+            return user
     except Exception as e:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid refresh token")
-
-
-def check_used_token(token: str) -> bool:
-    try:
-        with SessionLocal() as db:
-            token = db.query(models.UsedToken).filter(models.UsedToken.token == token).first()
-            if token:
-                raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Token already used.")
-            else:
-                return False
-    except Exception as e:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
