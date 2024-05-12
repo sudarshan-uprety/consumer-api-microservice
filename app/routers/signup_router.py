@@ -14,10 +14,5 @@ router = APIRouter(
 @router.post('/signup', status_code=status.HTTP_201_CREATED, response_model=schemas.UserOut)
 async def signup(user: schemas.UserCreate, db: Session = Depends(get_db), background_tasks: BackgroundTasks
                  = BackgroundTasks()) -> User:
-    try:
-        user_create = await api.create_user_api(user=user, db=db, bg_task=background_tasks)
-        return user_create
-    except HTTPException as e:
-        raise e
-    except Exception as e:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+    user_create = await api.create_user_api(user=user, db=db, bg_task=background_tasks)
+    return user_create

@@ -3,8 +3,6 @@ from datetime import datetime
 from pydantic import BaseModel, EmailStr, root_validator, validator, ValidationError
 from fastapi import HTTPException, status
 
-from app.validation import login_user_verification
-
 
 class UserOut(BaseModel):
     id: int
@@ -21,12 +19,6 @@ class UserCreate(BaseModel):
     password: str
     confirm_password: str
     phone: str
-
-    @validator('confirm_password')
-    def validate(cls, confirm_password, values):
-        if confirm_password != values["password"]:
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Passwords do not match')
-        return values
 
 
 class UserLogin(BaseModel):
@@ -66,28 +58,11 @@ class TokenResponse(BaseModel):
 class EmailSchema(BaseModel):
     email: EmailStr
 
-    @root_validator(pre=True)
-    def validate(cls, field_values):
-        user = login_user_verification(field_values['email'])
-        return field_values
-
 
 class ForgetPasswordRequest(BaseModel):
     password: str
     confirm_password: str
     token: str
-
-    @root_validator(pre=True)
-    def validate(cls, field_values):
-        try:
-            if len(field_values['password']) < 8:
-                raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
-                                    detail="Password must be at least 8 characters")
-            if field_values['password'] != field_values['confirm_password']:
-                raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Passwords do not match")
-            return field_values
-        except Exception as e:
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
 
 class UserDetails(BaseModel):

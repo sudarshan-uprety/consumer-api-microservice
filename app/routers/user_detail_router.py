@@ -15,10 +15,5 @@ router = APIRouter(
 
 @router.get('/me', summary='Get details of currently logged in user', response_model=UserDetails)
 async def get_me(user: User = Depends(get_current_user), db: Session = Depends(get_db)) -> UserDetails:
-    try:
-        user = await api.get_user_api(email=user.email, db=db)
-        return UserDetails(**user.__dict__)
-    except HTTPException as e:
-        raise e
-    except Exception as e:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+    user = await api.get_user_api(email=user.email, db=db)
+    return UserDetails(**user.__dict__)
