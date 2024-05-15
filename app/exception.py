@@ -1,8 +1,11 @@
+from urllib.request import Request
 from fastapi.responses import JSONResponse
-from fastapi.exceptions import RequestValidationError
+from fastapi.exceptions import ValidationException, HTTPException
+from app.utils.log import logger
 
 
-def standard_validation_exception_handler(request, exc: RequestValidationError):
+def custom_validation_exception_handler(request, exc: ValidationException) -> JSONResponse:
+    print('hey', exc)
     missing_fields = []
     for err in exc.errors():
         if err["type"] == "missing":
@@ -26,3 +29,8 @@ def standard_validation_exception_handler(request, exc: RequestValidationError):
             status_code=422,
             content={"message": "Validation error", "details": exc.errors()},
         )
+
+
+def custom_http_exception_handler(request: Request, exc: HTTPException) -> JSONResponse:
+    logger.exception(msg=f'Http exception with f{exc.detail}, status_code: {exc.status_code}')
+    return JSONResponse(status_code=exc.status_code, content={"detail": str(exc.detail)})
