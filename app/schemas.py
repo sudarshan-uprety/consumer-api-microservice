@@ -1,7 +1,6 @@
 from datetime import datetime
 
-from pydantic import BaseModel, EmailStr, root_validator, validator, ValidationError
-from fastapi import HTTPException, status
+from pydantic import BaseModel, EmailStr
 
 
 class UserOut(BaseModel):
@@ -10,7 +9,7 @@ class UserOut(BaseModel):
     email: EmailStr
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class UserCreate(BaseModel):
@@ -43,7 +42,7 @@ class SystemUser(BaseModel):
     email: str
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class RefreshTokenRequest(BaseModel):
