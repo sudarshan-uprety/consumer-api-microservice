@@ -24,8 +24,7 @@ async def login_user_verification(email: str, password: str, db: Session) -> mod
     if not user.is_active or user.is_deleted:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Inactive or deleted account')
 
-    if not await verify_password(password=password, hashed_pass=user.password):
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Incorrect email or password')
+    await verify_password(password=password, hashed_pass=user.password)
 
     return user
 
@@ -50,3 +49,8 @@ async def check_used_token(token: str, db: Session) -> bool:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Token already used.")
     else:
         return False
+
+
+async def current_password_validation(old_hashed_password: str, new_hashed_password: str) -> None:
+    if old_hashed_password == new_hashed_password:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="New password can not be current password.")

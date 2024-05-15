@@ -1,9 +1,8 @@
-from fastapi import FastAPI, Response, status, HTTPException, Depends, APIRouter, BackgroundTasks
+from fastapi import status, Depends, APIRouter
 from sqlalchemy.orm import Session
 
 from app.database.database import get_db
-from app import schemas, api, validation
-from app.utils.jwt_token import create_refresh_token, create_access_token
+from app import schemas, api
 
 router = APIRouter(
     prefix="/accounts",

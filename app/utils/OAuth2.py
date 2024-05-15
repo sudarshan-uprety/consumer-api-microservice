@@ -17,7 +17,7 @@ reuseable_oauth = OAuth2PasswordBearer(
 )
 
 
-async def get_current_user(token: str = Depends(reuseable_oauth), db: Session = Depends(get_db)) -> SystemUser:
+async def get_current_user(token: str = Depends(reuseable_oauth), db: Session = Depends(get_db)) -> models.User:
     try:
         payload = jwt.decode(
             token, JWT_SECRET_KEY, algorithms=[ALGORITHM]
@@ -43,5 +43,4 @@ async def get_current_user(token: str = Depends(reuseable_oauth), db: Session = 
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Could not find user",
         )
-
-    return SystemUser(**user.__dict__)
+    return user

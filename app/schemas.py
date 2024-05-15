@@ -71,3 +71,9 @@ class UserDetails(BaseModel):
     email: EmailStr
     created_at: datetime
     phone: str
+
+
+class ChangePasswordRequest(BaseModel):
+    current_password: str
+    new_password: str
+    confirm_password: str

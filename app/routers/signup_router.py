@@ -1,4 +1,4 @@
-from fastapi import status, HTTPException, Depends, APIRouter, BackgroundTasks
+from fastapi import status, Depends, APIRouter, BackgroundTasks
 from sqlalchemy.orm import Session
 
 from app.database.database import get_db
