@@ -21,7 +21,7 @@ services:
     depends_on:
       - authentication_database_psql
     ports:
-      - "8000:8000"
+      - "9000:9000"
 
 volumes:
   postgres_data:
