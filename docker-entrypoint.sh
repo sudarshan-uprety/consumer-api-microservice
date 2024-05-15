@@ -2,4 +2,6 @@
 
 echo "Starting authentication service"
 
-uvicorn main:app --host 0.0.0.0 --port 81
+alembic upgrade head
+
+uvicorn main:app --host 0.0.0.0 --port 8000

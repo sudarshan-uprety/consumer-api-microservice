@@ -1,0 +1,41 @@
+name: build_main
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  authentication-service:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.9]
+
+    steps:
+    - name: Checkout code for deployment
+      uses: actions/checkout@v3
+
+    - name: Create .env file
+      run: |
+        echo "${{ vars.ENV_FILE }}" > .env
+
+    - name: rsync deployments
+      uses: burnett01/rsync-deployments@master
+      with:
+        switches: -avzr --delete
+        path: ./
+        remote_path: /home/ubuntu/nba_backend/uat
+        remote_host: ${{ secrets.HOST }}
+        remote_user: ${{ secrets.SSH_USER }}
+        remote_key: ${{ secrets.SSH_KEY }}
+
+    - name: start the docker container
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.SSH_USER }}
+        key: ${{ secrets.SSH_KEY }}
+        script: |
+            cd /home/azureuser/sudarshan/ecommerce/authentication
+            sudo docker compose up --build -d
+            sudo docker image prune -f

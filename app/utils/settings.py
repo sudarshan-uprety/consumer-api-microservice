@@ -11,6 +11,9 @@ DATABASE_URL = "postgresql+psycopg2://{username}:{password}@{host}:{port}/{db_na
     password=os.getenv("USER_POSTGRES_DB_PASSWORD"),
 )
 
+print(os.getenv("USER_POSTGRES_DB_PASSWORD"))
+print(DATABASE_URL)
+
 ACCESS_TOKEN_EXPIRE_MINUTES = os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES")
 REFRESH_TOKEN_EXPIRE_MINUTES = os.getenv("REFRESH_TOKEN_EXPIRE_MINUTES")
 ALGORITHM = os.getenv("ALGORITHM")
