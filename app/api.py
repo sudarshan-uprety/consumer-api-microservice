@@ -11,7 +11,7 @@ from app.utils.email import send_forget_password_mail
 async def login_user_api(user_in: schemas.UserLogin, db: Session) -> schemas.LoginResponse:
     try:
         user = await validation.login_user_verification(email=user_in.email, password=user_in.password, db=db)
-        user_out = schemas.UserOut(**user)
+        user_out = schemas.UserOut(**user.__dict__)
         response = schemas.LoginResponse(access_token=jwt_token.create_access_token(user.email),
                                          refresh_token=jwt_token.create_refresh_token(user.email), user=user_out)
         return response
