@@ -1,6 +1,7 @@
 #!/bin/bash
 
 echo "Starting authentication service"
+echo "Environment: $ENV"
 
 # Set the port based on the environment
 case "$ENV" in
