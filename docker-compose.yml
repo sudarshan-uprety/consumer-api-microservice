@@ -22,8 +22,8 @@ services:
       - authentication_database_psql
     ports:
       - "9000-9002:9000"
-    env_file:
-      - .env
+    environment:
+    - env=${env}
 
 volumes:
   postgres_data:
