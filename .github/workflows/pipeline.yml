@@ -61,4 +61,4 @@ jobs:
               echo "Unexpected branch"
               exit 1
             fi
-            sudo docker image prune -a --force
+#            sudo docker image prune -a --force
