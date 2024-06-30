@@ -6,13 +6,13 @@ echo "Environment: $env"
 # Set the port based on the environment
 case "$env" in
   "prod")
-    PORT=9002
+    PORT=9000
     ;;
   "uat")
-    PORT=9001
+    PORT=9002
     ;;
   "dev")
-    PORT=9000
+    PORT=9001
     ;;
   *)
     echo "Unknown environment: $env"

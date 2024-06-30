@@ -50,5 +50,15 @@ jobs:
         key: ${{ secrets.SSH_KEY }}
         script: |
             cd /home/azureuser/sudarshan/ecommerce/authentication/${{ github.ref_name }}
-            sudo docker compose -p authentication_${{ github.ref_name }} up --build -d
+          
+            if [[ "${{ github.ref_name }}" == "dev" ]]; then
+              sudo docker-compose -p micro_authentication_dev up --build -d
+            elif [[ "${{ github.ref_name }}" == "uat" ]]; then
+              sudo docker-compose -p micro_authentication_uat up --build -d
+            elif [[ "${{ github.ref_name }}" == "prod" ]]; then
+              sudo docker-compose -p micro_authentication_prod up --build -d
+            else
+              echo "Unsupported branch: ${{ github.ref_name }}"
+              exit 1
+            fi
             sudo docker system prune
