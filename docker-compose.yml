@@ -21,7 +21,9 @@ services:
     depends_on:
       - authentication_database_psql
     ports:
-      - "9000:9000"
+      - "9000-9002:9000"
+    environment:
+      ENV: ${ENV}
 
 volumes:
   postgres_data:
