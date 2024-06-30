@@ -23,7 +23,7 @@ services:
     ports:
       - "9000-9002:9000"
     environment:
-      ENV: ${ENV}
+    - env=${env}
 
 volumes:
   postgres_data:

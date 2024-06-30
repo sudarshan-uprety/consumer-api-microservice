@@ -1,9 +1,10 @@
 #!/bin/bash
 
 echo "Starting authentication service"
+echo "Environment: $env"
 
 # Set the port based on the environment
-case "$ENV" in
+case "$env" in
   "prod")
     PORT=9002
     ;;
@@ -14,7 +15,7 @@ case "$ENV" in
     PORT=9000
     ;;
   *)
-    echo "Unknown environment: $ENV"
+    echo "Unknown environment: $env"
     exit 1
     ;;
 esac

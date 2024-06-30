@@ -49,6 +49,6 @@ jobs:
         username: ${{ secrets.SSH_USER }}
         key: ${{ secrets.SSH_KEY }}
         script: |
-            cd /home/azureuser/sudarshan/ecommerce/authentication/${{ github.ref }}
-            sudo docker compose up --build -d
+            cd /home/azureuser/sudarshan/ecommerce/authentication/${{ github.ref_name }}
+            sudo docker compose -p authentication_${{ github.ref_name }} up --build -d
             sudo docker system prune
