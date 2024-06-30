@@ -21,7 +21,7 @@ services:
     depends_on:
       - auth_db_dev
     ports:
-      - "9001:9000"
+      - "9001:5000"
     environment:
       - env=dev
     container_name: auth_dev
@@ -46,7 +46,7 @@ services:
     depends_on:
       - auth_db_uat
     ports:
-      - "9002:9000"
+      - "9002:5000"
     environment:
       - env=uat
     container_name: auth_uat
@@ -71,7 +71,7 @@ services:
     depends_on:
       - auth_db_prod
     ports:
-      - "9000:9000"
+      - "9000:5000"
     environment:
       - env=prod
     container_name: auth_prod
