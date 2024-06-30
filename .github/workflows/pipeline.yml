@@ -50,5 +50,15 @@ jobs:
         key: ${{ secrets.SSH_KEY }}
         script: |
             cd /home/azureuser/sudarshan/ecommerce/authentication/${{ github.ref_name }}
-            sudo docker compose -p authentication_${{ github.ref_name }} up --build -d
-            sudo docker system prune
+          
+            if [[ "${{ github.ref }}" == "refs/heads/dev" ]]; then
+              sudo docker-compose up -d auth_db_dev auth_service_dev
+            elif [[ "${{ github.ref }}" == "refs/heads/uat" ]]; then
+              sudo docker-compose up -d auth_db_uat auth_service_uat
+            elif [[ "${{ github.ref }}" == "refs/heads/prod" ]]; then
+              sudo docker-compose up -d auth_db_prod auth_service_prod
+            else
+              echo "Unexpected branch"
+              exit 1
+            fi
+            sudo docker image prune -a --force
