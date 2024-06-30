@@ -52,11 +52,11 @@ jobs:
             cd /home/azureuser/sudarshan/ecommerce/authentication/${{ github.ref_name }}
           
             if [[ "${{ github.ref }}" == "refs/heads/dev" ]]; then
-              docker-compose up -d authentication_database_dev authentication_service_dev
+              sudo docker-compose up -d authentication_database_dev authentication_service_dev
             elif [[ "${{ github.ref }}" == "refs/heads/uat" ]]; then
-              docker-compose up -d authentication_database_uat authentication_service_uat
+              sudo docker-compose up -d authentication_database_uat authentication_service_uat
             elif [[ "${{ github.ref }}" == "refs/heads/prod" ]]; then
-              docker-compose up -d authentication_database_prod authentication_service_prod
+              sudo docker-compose up -d authentication_database_prod authentication_service_prod
             else
               echo "Unexpected branch"
               exit 1
