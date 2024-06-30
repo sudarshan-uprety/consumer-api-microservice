@@ -1,7 +1,7 @@
 version: '3'
 
 services:
-  authentication_database_dev:
+  auth_db_dev:
     image: postgres:latest
     restart: always
     environment:
@@ -13,20 +13,20 @@ services:
     volumes:
       - postgres_data_dev:/var/lib/postgresql/data
 
-  authentication_service_dev:
+  auth_service_dev:
     build:
       context: .
       dockerfile: Dockerfile
     restart: always
     depends_on:
-      - authentication_database_dev
+      - auth_db_dev
     ports:
       - "9001:9000"
     environment:
       - env=dev
-    container_name: micro_authentication_dev
+    container_name: auth_dev
 
-  authentication_database_uat:
+  auth_db_uat:
     image: postgres:latest
     restart: always
     environment:
@@ -38,20 +38,20 @@ services:
     volumes:
       - postgres_data_uat:/var/lib/postgresql/data
 
-  authentication_service_uat:
+  auth_service_uat:
     build:
       context: .
       dockerfile: Dockerfile
     restart: always
     depends_on:
-      - authentication_database_uat
+      - auth_db_uat
     ports:
       - "9002:9000"
     environment:
       - env=uat
-    container_name: micro_authentication_uat
+    container_name: auth_uat
 
-  authentication_database_prod:
+  auth_db_prod:
     image: postgres:latest
     restart: always
     environment:
@@ -63,18 +63,18 @@ services:
     volumes:
       - postgres_data_prod:/var/lib/postgresql/data
 
-  authentication_service_prod:
+  auth_service_prod:
     build:
       context: .
       dockerfile: Dockerfile
     restart: always
     depends_on:
-      - authentication_database_prod
+      - auth_db_prod
     ports:
       - "9000:9000"
     environment:
       - env=prod
-    container_name: micro_authentication_prod
+    container_name: auth_prod
 
 volumes:
   postgres_data_dev:
