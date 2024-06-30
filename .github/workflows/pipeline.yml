@@ -51,14 +51,13 @@ jobs:
         script: |
             cd /home/azureuser/sudarshan/ecommerce/authentication/${{ github.ref_name }}
           
-            if [[ "${{ github.ref_name }}" == "dev" ]]; then
-              sudo docker-compose -p micro_authentication_dev up --build -d
-            elif [[ "${{ github.ref_name }}" == "uat" ]]; then
-              sudo docker-compose -p micro_authentication_uat up --build -d
-            elif [[ "${{ github.ref_name }}" == "prod" ]]; then
-              sudo docker-compose -p micro_authentication_prod up --build -d
+            if [[ "${{ github.ref }}" == "refs/heads/dev" ]]; then
+              docker-compose up -d authentication_database_dev authentication_service_dev
+            elif [[ "${{ github.ref }}" == "refs/heads/uat" ]]; then
+              docker-compose up -d authentication_database_uat authentication_service_uat
+            elif [[ "${{ github.ref }}" == "refs/heads/prod" ]]; then
+              docker-compose up -d authentication_database_prod authentication_service_prod
             else
-              echo "Unsupported branch: ${{ github.ref_name }}"
+              echo "Unexpected branch"
               exit 1
             fi
-            sudo docker system prune
