@@ -22,6 +22,7 @@ esac
 
 # Run Alembic migrations
 alembic upgrade head
+echo "Port is: $env"
 
 # Start the application with the appropriate port
 uvicorn main:app --host 0.0.0.0 --port $PORT
