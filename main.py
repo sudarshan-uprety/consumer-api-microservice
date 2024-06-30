@@ -28,5 +28,5 @@ app.add_exception_handler(RequestValidationError, exception.custom_validation_ex
 app.add_exception_handler(HTTPException, exception.custom_http_exception_handler)
 
 
-if __name__ == '__main__':
-    run(app, host="0.0.0.0", port=9000)
+# if __name__ == '__main__':
+#     run(app, host="0.0.0.0", port=9000)

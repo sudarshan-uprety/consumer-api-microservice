@@ -1,7 +1,7 @@
 version: '3'
 
 services:
-  authentication_database_psql:
+  auth_db_dev:
     image: postgres:latest
     restart: always
     environment:
@@ -11,19 +11,72 @@ services:
     env_file:
       - .env
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - postgres_data_dev:/var/lib/postgresql/data
 
-  authentication_service:
+  auth_service_dev:
     build:
       context: .
       dockerfile: Dockerfile
     restart: always
     depends_on:
-      - authentication_database_psql
+      - auth_db_dev
     ports:
-      - "9000-9002:9000"
+      - "9001:5000"
     environment:
-      ENV: ${ENV}
+      - env=dev
+    container_name: auth_dev
+
+  auth_db_uat:
+    image: postgres:latest
+    restart: always
+    environment:
+      POSTGRES_DB: ${USER_POSTGRES_DB_NAME}
+      POSTGRES_USER: ${USER_POSTGRES_DB_USER}
+      POSTGRES_PASSWORD: ${USER_POSTGRES_DB_PASSWORD}
+    env_file:
+      - .env
+    volumes:
+      - postgres_data_uat:/var/lib/postgresql/data
+
+  auth_service_uat:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    depends_on:
+      - auth_db_uat
+    ports:
+      - "9002:5000"
+    environment:
+      - env=uat
+    container_name: auth_uat
+
+  auth_db_prod:
+    image: postgres:latest
+    restart: always
+    environment:
+      POSTGRES_DB: ${USER_POSTGRES_DB_NAME}
+      POSTGRES_USER: ${USER_POSTGRES_DB_USER}
+      POSTGRES_PASSWORD: ${USER_POSTGRES_DB_PASSWORD}
+    env_file:
+      - .env
+    volumes:
+      - postgres_data_prod:/var/lib/postgresql/data
+
+  auth_service_prod:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    depends_on:
+      - auth_db_prod
+    ports:
+      - "9000:5000"
+    environment:
+      - env=prod
+    container_name: auth_prod
 
 volumes:
-  postgres_data:
+  postgres_data_dev:
+  postgres_data_uat:
+  postgres_data_prod:

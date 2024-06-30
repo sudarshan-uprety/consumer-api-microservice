@@ -37,7 +37,7 @@ jobs:
       with:
         switches: -avzr --delete
         path: ./
-        remote_path: /home/azureuser/sudarshan/ecommerce/authentication/${{ github.ref }}
+        remote_path: /home/azureuser/sudarshan/ecommerce/authentication/${{ github.ref_name }}
         remote_host: ${{ secrets.HOST }}
         remote_user: ${{ secrets.SSH_USER }}
         remote_key: ${{ secrets.SSH_KEY }}
@@ -49,6 +49,16 @@ jobs:
         username: ${{ secrets.SSH_USER }}
         key: ${{ secrets.SSH_KEY }}
         script: |
-            cd /home/azureuser/sudarshan/ecommerce/authentication/${{ github.ref }}
-            sudo docker compose up --build -d
-            sudo docker system prune
+            cd /home/azureuser/sudarshan/ecommerce/authentication/${{ github.ref_name }}
+          
+            if [[ "${{ github.ref }}" == "refs/heads/dev" ]]; then
+              sudo docker-compose up -d auth_db_dev auth_service_dev
+            elif [[ "${{ github.ref }}" == "refs/heads/uat" ]]; then
+              sudo docker-compose up -d auth_db_uat auth_service_uat
+            elif [[ "${{ github.ref }}" == "refs/heads/prod" ]]; then
+              sudo docker-compose up -d auth_db_prod auth_service_prod
+            else
+              echo "Unexpected branch"
+              exit 1
+            fi
+            sudo docker image prune -a --force
