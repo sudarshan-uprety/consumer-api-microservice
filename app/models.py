@@ -1,6 +1,6 @@
 from datetime import datetime
 from sqlalchemy import (
-    LargeBinary,
+    ForeignKey,
     Column,
     String,
     Integer,
@@ -11,6 +11,7 @@ from sqlalchemy import (
     func
 )
 from app.database.database import Base
+from sqlalchemy.orm import relationship
 
 
 class Common(object):
@@ -31,6 +32,8 @@ class User(Base, Common):
     password = Column(String, nullable=False)
     is_active = Column(Boolean, default=False)
     is_deleted = Column(Boolean, default=False)
+    payments = relationship("UserPayment", back_populates="user")
+    orders = relationship("UserOrder", back_populates="user")
 
     UniqueConstraint("email", name="uq_user_email")
     PrimaryKeyConstraint("id", name="pk_user_id")
@@ -43,3 +46,28 @@ class UsedToken(Base):
     token = Column(String, unique=True, index=True)
     created_at = Column(DateTime, default=datetime.utcnow())
     used_at = Column(DateTime)
+
+
+class UserPayment(Base, Common):
+    __tablename__ = "user_payments"
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    payment_id = Column(String, index=True, unique=True)
+    payment_method = Column(String, index=True)
+    amount_paid = Column(String, index=True)
+    user = relationship("User", back_populates="payments")
+    order = relationship("UserOrder", back_populates="payment", uselist=False)
+
+
+class UserOrder(Base, Common):
+    __tablename__ = "user_orders"
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    user = relationship("User", back_populates="orders")
+    payment_id = Column(Integer, ForeignKey("user_payments.id"), nullable=True)
+    payment = relationship("UserPayment", back_populates="order")
+    product = Column(String, index=True)
+    quantity = Column(Integer, index=True)
+    price = Column(String, index=True)
+    address = Column(String, index=True)
+    is_delivered = Column(Boolean, default=False)
