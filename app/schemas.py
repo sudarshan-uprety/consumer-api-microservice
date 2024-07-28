@@ -1,6 +1,8 @@
 from datetime import datetime
 
 from pydantic import BaseModel, EmailStr
+from typing import List
+
 
 
 class UserOut(BaseModel):
@@ -76,3 +78,28 @@ class ChangePasswordRequest(BaseModel):
     current_password: str
     new_password: str
     confirm_password: str
+
+
+class UserOrder(BaseModel):
+    id: int
+    product: str
+    quantity: int
+    price: float
+    is_delivered: bool
+
+    class Config:
+        from_attributes = True
+
+
+class UserOrderList(BaseModel):
+    orders: List[UserOrder]
+
+# class UserOrderList(BaseModel):
+#     id: str
+#     product: str
+#     quantity: int
+#     price: float
+#     is_delivered: bool
+#
+#     class Config:
+#         from_attributes = True
