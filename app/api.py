@@ -126,3 +126,12 @@ async def change_password_api(data: schemas.ChangePasswordRequest, user: models.
         raise e
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+
+
+async def get_orders_api(current_user: models.User, db: Session):
+    try:
+        return db.query(models.UserOrder).filter(models.UserOrder.user_id == current_user.id).all()
+    except HTTPException as e:
+        raise e
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))

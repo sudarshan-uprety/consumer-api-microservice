@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError, HTTPException
 from starlette.middleware.base import BaseHTTPMiddleware
 
-from app.routers import login_router, password_router, signup_router, verify_router, user_detail_router
+from app.routers import login_router, password_router, signup_router, verify_router, user_detail_router, order_router
 from app import exception, middleware
 from uvicorn import run
 
@@ -22,6 +22,7 @@ app.include_router(signup_router.router)
 app.include_router(password_router.router)
 app.include_router(verify_router.router)
 app.include_router(user_detail_router.router)
+app.include_router(order_router.router)
 
 # add custom exception in app
 app.add_exception_handler(RequestValidationError, exception.custom_validation_exception_handler)
