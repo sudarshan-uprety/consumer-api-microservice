@@ -2,9 +2,10 @@ from fastapi import Depends, APIRouter, BackgroundTasks
 from sqlalchemy.orm import Session
 from fastapi.responses import JSONResponse
 
-from app.schemas import EmailSchema, ForgetPasswordRequest, ChangePasswordRequest
-from app.database.database import get_db
-from app import api, models
+from app.schema.schemas import EmailSchema, ForgetPasswordRequest, ChangePasswordRequest
+from utils.database import get_db
+from app.api import api
+from app.user import models
 from app.utils.OAuth2 import get_current_user
 
 router = APIRouter(
@@ -27,7 +28,7 @@ async def forget_password_validate(data: ForgetPasswordRequest, db: Session = De
 
 
 @router.post('/change/password')
-async def change_password(data: ChangePasswordRequest, current_user: models.User = Depends(get_current_user),
+async def change_password(data: ChangePasswordRequest, current_user: models.Users = Depends(get_current_user),
                           db: Session = Depends(get_db)) -> JSONResponse:
     await api.change_password_api(data=data, user=current_user, db=db)
     return JSONResponse(status_code=200, content={"detail": "Password changed successfully."})
