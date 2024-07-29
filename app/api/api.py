@@ -3,7 +3,9 @@ from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 from datetime import datetime
 
-from app import models, schemas, usecase, validation
+from app.models import models
+from app.others import validation, usecase
+from app.schema import schemas
 from app.utils import jwt_token, OAuth2, email
 from app.utils.email import send_forget_password_mail
 

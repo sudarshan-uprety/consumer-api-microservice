@@ -1,8 +1,8 @@
-from fastapi_mail import ConnectionConfig, FastMail, MessageSchema, MessageType
+from fastapi_mail import ConnectionConfig, FastMail, MessageSchema
 from starlette.responses import JSONResponse
 
 from app.utils.templates import templates
-from app.models import User
+from app.models.models import User
 from app.utils.settings import *
 
 conf = ConnectionConfig(

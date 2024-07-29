@@ -1,10 +1,10 @@
-from fastapi import status, Depends, APIRouter, BackgroundTasks
+from fastapi import Depends, APIRouter
 from sqlalchemy.orm import Session
 
 from app.database.database import get_db
 from app import api
-from app.models import UserOrder, User
-from app.schemas import UserOrderList
+from app.models.models import UserOrder, User
+from app.schema.schemas import UserOrderList
 from app.utils.OAuth2 import get_current_user
 
 router = APIRouter(

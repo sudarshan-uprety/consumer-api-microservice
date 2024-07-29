@@ -2,8 +2,9 @@ from fastapi import status, Depends, APIRouter, BackgroundTasks
 from sqlalchemy.orm import Session
 
 from app.database.database import get_db
-from app import schemas, api
-from app.models import User
+from app import api
+from app.schema import schemas
+from app.models.models import User
 
 router = APIRouter(
     prefix="/accounts",

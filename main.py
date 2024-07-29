@@ -3,9 +3,8 @@ from fastapi.exceptions import RequestValidationError, HTTPException
 from starlette.middleware.base import BaseHTTPMiddleware
 
 from app.routers import login_router, password_router, signup_router, verify_router, user_detail_router, order_router
-from app import exception, middleware
-from uvicorn import run
-
+from app.utils import middleware
+from app.others import exception
 
 app = FastAPI(
     title="Authentication backend",

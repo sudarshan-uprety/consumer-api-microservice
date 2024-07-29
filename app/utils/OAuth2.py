@@ -1,4 +1,3 @@
-from typing import Union, Any
 from datetime import datetime
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
@@ -7,9 +6,9 @@ from sqlalchemy.orm import Session
 from jose import jwt
 
 from pydantic import ValidationError
-from app.schemas import TokenPayload, SystemUser
+from app.schema.schemas import TokenPayload
 from app.database.database import get_db
-from app import models
+from app.models import models
 
 reuseable_oauth = OAuth2PasswordBearer(
     tokenUrl="/login",

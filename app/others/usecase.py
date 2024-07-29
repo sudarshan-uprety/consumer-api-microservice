@@ -4,8 +4,9 @@ from fastapi import HTTPException, status
 
 from sqlalchemy.orm import Session
 
-from app.models import User
+from app.models.models import User
 from app.utils.jwt_token import get_hashed_password
+
 
 async def get_user_or_404(email: str, db: Session):
     user = db.query(User).filter(User.email == email).first()

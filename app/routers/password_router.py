@@ -2,9 +2,10 @@ from fastapi import Depends, APIRouter, BackgroundTasks
 from sqlalchemy.orm import Session
 from fastapi.responses import JSONResponse
 
-from app.schemas import EmailSchema, ForgetPasswordRequest, ChangePasswordRequest
+from app.schema.schemas import EmailSchema, ForgetPasswordRequest, ChangePasswordRequest
 from app.database.database import get_db
-from app import api, models
+from app.api import api
+from app.models import models
 from app.utils.OAuth2 import get_current_user
 
 router = APIRouter(

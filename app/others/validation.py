@@ -5,7 +5,8 @@ from jose import jwt
 from sqlalchemy.orm import Session
 from sqlalchemy import or_
 
-from app import models, usecase
+from app.models import models
+from app.others import usecase
 from app.utils.jwt_token import verify_password
 from app.utils.settings import JWT_REFRESH_SECRET_KEY, ALGORITHM
 

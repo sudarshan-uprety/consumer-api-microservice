@@ -2,7 +2,8 @@ from fastapi import status, Depends, APIRouter
 from sqlalchemy.orm import Session
 
 from app.database.database import get_db
-from app import schemas, api
+from app import api
+from app.schema import schemas
 
 router = APIRouter(
     prefix="/accounts",
