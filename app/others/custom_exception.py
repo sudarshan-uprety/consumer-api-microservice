@@ -9,4 +9,3 @@ class CustomException(Exception):
         self.error_code = error_code
         self.message = message
         return super(CustomException, self).__init__(*args, **kwargs)
-

@@ -25,20 +25,20 @@ async def login_user_api(user_in: schemas.UserLogin, db: Session) -> schemas.Log
 
 
 async def create_user_api(user: schemas.UserCreate, db: Session, bg_task: BackgroundTasks) -> models.User:
-    try:
-        await validation.password_validation(password=user.password, confirm_password=user.confirm_password)
-        await validation.signup_user_verification(email=user.email, phone=user.phone, db=db)
-        user_dict = user.dict(exclude={'confirm_password'})
-        user_dict['password'] = jwt_token.get_hashed_password(user_dict['password'])
-        user = models.User(**user_dict)
-        db.add(user)
-        db.commit()
-        bg_task.add_task(email.send_register_mail, user=user, token=jwt_token.create_access_token(user.email))
-        return user
-    except HTTPException as e:
-        raise e  # Re-raise the HTTPException without wrapping it
-    except Exception as e:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+    # try:
+    await validation.password_validation(password=user.password, confirm_password=user.confirm_password)
+    await validation.signup_user_verification(email=user.email, phone=user.phone, db=db)
+    user_dict = user.dict(exclude={'confirm_password'})
+    user_dict['password'] = jwt_token.get_hashed_password(user_dict['password'])
+    user = models.User(**user_dict)
+    db.add(user)
+    db.commit()
+    bg_task.add_task(email.send_register_mail, user=user, token=jwt_token.create_access_token(user.email))
+    return user
+    # except HTTPException as e:
+    #     raise e  # Re-raise the HTTPException without wrapping it
+    # except Exception as e:
+    #     raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
 
 async def verify_user_email_api(token: str, db: Session) -> models.User:

@@ -2,7 +2,7 @@ import json
 
 
 def pydantic_error(err):
-    errors_list = json.loads(err.json())
+    errors_list = err
     msg: dict = dict()
     for error in errors_list:
         new_msg: dict = dict()
@@ -57,13 +57,3 @@ def pydantic_error(err):
                     error["loc"][0].capitalize() + " " + error["msg"] + "."
                 )
     return msg
-
-
-def load_json(event):
-    body = event.get('body')
-
-    if body:
-        input_data = json.loads(body)
-        return input_data
-    else:
-        raise ValueError("Request body is missing")
