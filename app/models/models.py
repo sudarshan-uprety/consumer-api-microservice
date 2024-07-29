@@ -1,4 +1,6 @@
 from datetime import datetime
+
+from sqlalchemy.orm import declarative_base
 from sqlalchemy import (
     ForeignKey,
     Column,
@@ -10,8 +12,41 @@ from sqlalchemy import (
     DateTime,
     func
 )
-from app.database.database import Base
 from sqlalchemy.orm import relationship
+
+from app.database.database import SessionLocal
+
+Base = declarative_base()
+
+class BaseModel(Base):
+    __abstract__ = True
+
+    @classmethod
+    def get(cls, db: SessionLocal, id: int):
+        return db.query(cls).filter(cls.id == id).first()
+
+    @classmethod
+    def filter(cls, db: SessionLocal, **kwargs):
+        return db.query(cls).filter_by(**kwargs)
+
+    @classmethod
+    def create(cls, db: SessionLocal, **kwargs):
+        instance = cls(**kwargs)
+        db.add(instance)
+        db.commit()
+        db.refresh(instance)
+        return instance
+
+    def update(self, db: SessionLocal, **kwargs):
+        for key, value in kwargs.items():
+            setattr(self, key, value)
+        db.commit()
+        db.refresh(self)
+        return self
+
+    def delete(self, db: SessionLocal):
+        db.delete(self)
+        db.commit()
 
 
 class Common(object):

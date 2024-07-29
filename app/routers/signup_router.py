@@ -3,9 +3,8 @@ from sqlalchemy.orm import Session
 
 from app.database.database import get_db
 from app.api import api
-from app.schema import schemas, register_schema
+from app.schema import register_schema
 from app.models.models import User
-from app.others.exception import error_handler
 
 router = APIRouter(
     prefix="/accounts",
@@ -13,7 +12,6 @@ router = APIRouter(
 )
 
 
-# @error_handler
 @router.post('/signup', status_code=status.HTTP_201_CREATED, response_model=register_schema.UserRegisterResponse)
 async def signup(user: register_schema.UserRegister, db: Session = Depends(get_db), background_tasks: BackgroundTasks
                  = BackgroundTasks()) -> User:
