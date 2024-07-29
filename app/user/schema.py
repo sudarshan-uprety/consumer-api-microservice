@@ -40,10 +40,9 @@ class UserRegister(BaseModel):
 
 class UserRegisterResponse(BaseModel):
     email: EmailStr
-    name: str
+    full_name: str
     phone: str
     address: str
-    city: str
-    state: str
-    address: str
-    username: str
+
+    class Config:
+        from_attributes = True

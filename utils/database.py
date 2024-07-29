@@ -5,20 +5,10 @@ from sqlalchemy.pool import StaticPool
 from sqlalchemy.exc import OperationalError
 from utils.constant import *
 from utils.variables import DATABASE_URL
+from utils import store
 
 # Create the base class for declarative models
 Base = declarative_base()
-
-
-# Global store to manage database connection and session
-class Store:
-    def __init__(self):
-        self.engine = None
-        self.session = None
-        self.has_connection_established = False
-
-
-store = Store()
 
 
 def attach_query_property():
@@ -75,3 +65,7 @@ def rollback_session():
     """Rollback the session in case of an error."""
     if store.session:
         store.session.rollback()
+
+
+def get_db():
+    return store.session()

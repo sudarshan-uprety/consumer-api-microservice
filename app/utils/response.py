@@ -14,9 +14,9 @@ def success_response(status_code, message, data, warning: str = None):
     return JSONResponse(
         status_code=status_code,
         content={
-            "data": data,
             "success": True,
             "message": message,
+            "data": data,
             "status_code": status_code,
             'warning': warning
         }
@@ -27,9 +27,9 @@ def error_response(status_code, message, errors=[]):
     return JSONResponse(
         status_code=status_code,
         content={
-            "data": None,
             "success": False,
             "message": message,
+            "data": None,
             "errors": errors
         }
     )
