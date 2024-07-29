@@ -2,6 +2,7 @@ from fastapi import Request, status
 from fastapi.exceptions import RequestValidationError
 
 from sqlalchemy.orm.exc import NoResultFound
+from pydantic import ValidationError
 
 from app.others.custom_exception import ServerError, CustomException
 from app.others import helpers
@@ -10,11 +11,11 @@ from app.utils import response
 
 def exception_handlers(app):
     @app.exception_handler(RequestValidationError)
-    async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    async def validation_exception_handler(request: Request, exc: ValidationError):
         return response.error_response(
             status_code=status.HTTP_400_BAD_REQUEST,
-            message='Validation error',
-            errors=helpers.pydantic_error(exc.errors())
+            message='Invalid input data.',
+            errors=helpers.pydantic_error(exc.errors()).get('body')
         )
 
     @app.exception_handler(NoResultFound)

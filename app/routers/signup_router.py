@@ -1,10 +1,7 @@
-from fastapi import status, Depends, APIRouter, BackgroundTasks
-from sqlalchemy.orm import Session
-
-from app.database.database import get_db
-from app.api import api
-from app.schema import register_schema
-from app.models.models import User
+from fastapi import status, APIRouter, BackgroundTasks
+from app.user.schema import UserRegister, UserRegisterResponse
+from app.user.models import Users
+from app.utils import jwt_token
 
 router = APIRouter(
     prefix="/accounts",
@@ -12,8 +9,13 @@ router = APIRouter(
 )
 
 
-@router.post('/signup', status_code=status.HTTP_201_CREATED, response_model=register_schema.UserRegisterResponse)
-async def signup(user: register_schema.UserRegister, db: Session = Depends(get_db), background_tasks: BackgroundTasks
-                 = BackgroundTasks()) -> User:
-    user_create = await api.create_user_api(user=user, db=db, bg_task=background_tasks)
-    return user_create
+@router.post('/signup', status_code=status.HTTP_201_CREATED, response_model=UserRegisterResponse)
+async def signup(user: UserRegister, background_tasks: BackgroundTasks
+                 = BackgroundTasks()) -> Users:
+    hashed_password = jwt_token.get_hashed_password(user.password)
+    user_data = user.dict()
+    user_data['password'] = hashed_password
+    user_data.pop('confirm_password', None)  # Remove 'confirm_password' key if it exists
+    new_user = Users(**user_data)  # Unpack the remaining dictionary
+    new_user.save()
+    print('ok'*100)

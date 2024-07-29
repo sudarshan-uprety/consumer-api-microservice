@@ -2,7 +2,7 @@ from fastapi import status, Depends, APIRouter, Path
 from sqlalchemy.orm import Session
 from fastapi.responses import JSONResponse
 
-from app.database.database import get_db
+from utils.database import get_db
 from app import api
 
 

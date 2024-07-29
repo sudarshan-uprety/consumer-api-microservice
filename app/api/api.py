@@ -3,7 +3,7 @@ from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 from datetime import datetime
 
-from app.models import models
+from app.user import models
 from app.others import validation, usecase
 from app.schema import schemas
 from app.utils import jwt_token, OAuth2, email
@@ -24,8 +24,7 @@ async def login_user_api(user_in: schemas.UserLogin, db: Session) -> schemas.Log
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
 
-async def create_user_api(user: schemas.UserCreate, db: Session, bg_task: BackgroundTasks) -> models.User:
-    await validation.password_validation(password=user.password, confirm_password=user.confirm_password)
+async def create_user_api(user: schemas.UserCreate, db: Session, bg_task: BackgroundTasks) -> models.Users:
     await validation.signup_user_verification(email=user.email, phone=user.phone, db=db)
     user_dict = user.dict(exclude={'confirm_password'})
     user_dict['password'] = jwt_token.get_hashed_password(user_dict['password'])
@@ -35,7 +34,8 @@ async def create_user_api(user: schemas.UserCreate, db: Session, bg_task: Backgr
     bg_task.add_task(email.send_register_mail, user=user, token=jwt_token.create_access_token(user.email))
     return user
 
-async def verify_user_email_api(token: str, db: Session) -> models.User:
+
+async def verify_user_email_api(token: str, db: Session) -> models.Users:
     try:
         await validation.check_used_token(token=token, db=db)
         current_user = await OAuth2.get_current_user(token=token, db=db)
@@ -112,7 +112,7 @@ async def new_token_api(refresh_token: str) -> schemas.TokenResponse:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
 
-async def change_password_api(data: schemas.ChangePasswordRequest, user: models.User, db: Session):
+async def change_password_api(data: schemas.ChangePasswordRequest, user: models.Users, db: Session):
     try:
         await validation.password_validation(password=data.new_password, confirm_password=data.confirm_password)
         await jwt_token.verify_password(password=data.current_password, hashed_pass=user.password)
@@ -124,7 +124,7 @@ async def change_password_api(data: schemas.ChangePasswordRequest, user: models.
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
 
-async def get_orders_api(current_user: models.User, db: Session):
+async def get_orders_api(current_user: models.Users, db: Session):
     try:
         return db.query(models.UserOrder).filter(models.UserOrder.user_id == current_user.id).all()
     except HTTPException as e:

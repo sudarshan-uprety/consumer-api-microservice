@@ -1,16 +1,18 @@
 import json
 
+from pydantic import ValidationError
 
-def pydantic_error(err):
-    errors_list = err
+
+def pydantic_error(errors_list):
     msg: dict = dict()
     for error in errors_list:
+        # Build the nested error message
         new_msg: dict = dict()
         for key in reversed(error["loc"][1:]):
             if new_msg:
                 new_msg = {key: new_msg}
             else:
-                msg_key = " ".join(str(error).replace("_", " ").capitalize() for error in error["loc"])
+                msg_key = " ".join(str(e).replace("_", " ").capitalize() for e in error["loc"])
                 error_type = error.get("type", ".").split(".")[-1]
                 msg_footer: str = ""
                 if error_type == "bool":
