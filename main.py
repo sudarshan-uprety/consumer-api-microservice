@@ -52,39 +52,64 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
 
 @app.exception_handler(NoResultFound)
 async def not_found_exception_handler(request: Request, exc: NoResultFound):
-    return JSONResponse(
-        status_code=constant.ERROR_NOT_FOUND,
-        content={"message": str(exc), "errors": str(exc)}
+    return response.error_response(
+        status_code=status.HTTP_404_NOT_FOUND,
+        message='Not Found',
+        errors=str(exc)
     )
+    # return JSONResponse(
+    #     status_code=constant.ERROR_NOT_FOUND,
+    #     content={"message": str(exc), "errors": str(exc)}
+    # )
 
 
 @app.exception_handler(ValueError)
 async def value_error_handler(request: Request, exc: ValueError):
-    return JSONResponse(
-        status_code=constant.ERROR_BAD_REQUEST,
-        content={"message": str(exc), "errors": str(exc)}
+    return response.error_response(
+        status_code=status.HTTP_400_BAD_REQUEST,
+        message='Bad Request',
+        errors=str(exc)
     )
+    # return JSONResponse(
+    #     status_code=constant.ERROR_BAD_REQUEST,
+    #     content={"message": str(exc), "errors": str(exc)}
+    # )
 
 
 @app.exception_handler(ServerError)
 async def server_error_handler(request: Request, exc: ServerError):
-    return JSONResponse(
-        status_code=constant.ERROR_INTERNAL_SERVER_ERROR,
-        content={"message": constant.ERROR_SERVER_DOWN, "errors": str(exc.args)}
+    return response.error_response(
+        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        message='Internal Server Error',
+        errors=str(exc)
     )
+    # return JSONResponse(
+    #     status_code=constant.ERROR_INTERNAL_SERVER_ERROR,
+    #     content={"message": constant.ERROR_SERVER_DOWN, "errors": str(exc.args)}
+    # )
 
 
 @app.exception_handler(CustomException)
 async def custom_exception_handler(request: Request, exc: CustomException):
-    return JSONResponse(
-        status_code=constant.ERROR_INTERNAL_SERVER_ERROR,
-        content={"message": str(exc), "errors": "Something went wrong"}
+    return response.error_response(
+        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        message='Something went wrong.',
+        errors=str(exc)
     )
+    # return JSONResponse(
+    #     status_code=constant.ERROR_INTERNAL_SERVER_ERROR,
+    #     content={"message": str(exc), "errors": "Something went wrong"}
+    # )
 
 
 @app.exception_handler(Exception)
 async def general_exception_handler(request: Request, exc: Exception):
-    return JSONResponse(
-        status_code=constant.ERROR_INTERNAL_SERVER_ERROR,
-        content={"message": str(exc), "errors": str(exc)}
+    return response.error_response(
+        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        message='Something went wrong.',
+        errors=str(exc)
     )
+    # return JSONResponse(
+    #     status_code=constant.ERROR_INTERNAL_SERVER_ERROR,
+    #     content={"message": str(exc), "errors": str(exc)}
+    # )
