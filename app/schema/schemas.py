@@ -4,7 +4,6 @@ from pydantic import BaseModel, EmailStr
 from typing import List
 
 
-
 class UserOut(BaseModel):
     id: int
     full_name: str

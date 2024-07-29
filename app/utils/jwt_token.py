@@ -5,8 +5,8 @@ from datetime import datetime, timedelta
 from typing import Union, Any
 from jose import jwt
 
-from app.utils.settings import (ACCESS_TOKEN_EXPIRE_MINUTES, JWT_REFRESH_SECRET_KEY, ALGORITHM, JWT_SECRET_KEY,
-                                REFRESH_TOKEN_EXPIRE_MINUTES)
+from utils.variables import (ACCESS_TOKEN_EXPIRE_MINUTES, JWT_REFRESH_SECRET_KEY, ALGORITHM, JWT_SECRET_KEY,
+                             REFRESH_TOKEN_EXPIRE_MINUTES)
 
 password_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
