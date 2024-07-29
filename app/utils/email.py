@@ -1,9 +1,9 @@
-from fastapi_mail import ConnectionConfig, FastMail, MessageSchema, MessageType
+from fastapi_mail import ConnectionConfig, FastMail, MessageSchema
 from starlette.responses import JSONResponse
 
 from app.utils.templates import templates
-from app.models import User
-from app.utils.settings import *
+from app.user.models import Users
+from utils.variables import *
 
 conf = ConnectionConfig(
    MAIL_USERNAME=MAIL_USERNAME,
@@ -16,7 +16,7 @@ conf = ConnectionConfig(
 )
 
 
-async def send_register_mail(user: User, token: str):
+async def send_register_mail(user: Users, token: str):
     # HTML template for the email body
     template = templates.get_template(f'register.html')
     render_content = template.render(name=f'{user.full_name}', verification_url
@@ -38,7 +38,7 @@ async def send_register_mail(user: User, token: str):
     return JSONResponse(status_code=200, content={"message": "Email has been sent successfully."})
 
 
-async def send_forget_password_mail(user: User, token: str):
+async def send_forget_password_mail(user: Users, token: str):
     # HTML template for the email body
     template = templates.get_template(f'forget_password.html')
     render_content = template.render(name=f'{user.full_name}', verify_link
