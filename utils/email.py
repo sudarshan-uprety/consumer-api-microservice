@@ -1,18 +1,17 @@
 from fastapi_mail import ConnectionConfig, FastMail, MessageSchema
-from starlette.responses import JSONResponse
 
-from app.utils.templates import templates
 from app.user.models import Users
+from utils.templates import templates
 from utils.variables import *
 
 conf = ConnectionConfig(
-   MAIL_USERNAME=MAIL_USERNAME,
-   MAIL_FROM=MAIL_FROM,
-   MAIL_PASSWORD=MAIL_PASSWORD,
-   MAIL_PORT=MAIL_PORT,
-   MAIL_SERVER=MAIL_SERVER,
-   MAIL_STARTTLS=True,
-   MAIL_SSL_TLS=False
+    MAIL_USERNAME=MAIL_USERNAME,
+    MAIL_FROM=MAIL_FROM,
+    MAIL_PASSWORD=MAIL_PASSWORD,
+    MAIL_PORT=MAIL_PORT,
+    MAIL_SERVER=MAIL_SERVER,
+    MAIL_STARTTLS=True,
+    MAIL_SSL_TLS=False
 )
 
 
@@ -20,7 +19,7 @@ async def send_register_mail(user: Users, token: str):
     # HTML template for the email body
     template = templates.get_template(f'register.html')
     render_content = template.render(name=f'{user.full_name}', verification_url
-                                     =f'{ROOT_URL}/accounts/verify/user/{token}')
+    =f'{ROOT_URL}/accounts/verify/user/{token}')
 
     # Create message schema
     message = MessageSchema(
@@ -33,16 +32,15 @@ async def send_register_mail(user: Users, token: str):
     # Send email using FastAPI-Mail
     fm = FastMail(conf)
     await fm.send_message(message)
-
-    # Return response
-    return JSONResponse(status_code=200, content={"message": "Email has been sent successfully."})
 
 
 async def send_forget_password_mail(user: Users, token: str):
     # HTML template for the email body
     template = templates.get_template(f'forget_password.html')
-    render_content = template.render(name=f'{user.full_name}', verify_link
-                                     =f'{ROOT_URL}/accounts/forget/password/{token}')
+    render_content = template.render(
+        name=f'{user.full_name}',
+        verify_link=f'{ROOT_URL}/accounts/forget/password/{token}'
+    )
 
     # Create message schema
     message = MessageSchema(
@@ -55,6 +53,3 @@ async def send_forget_password_mail(user: Users, token: str):
     # Send email using FastAPI-Mail
     fm = FastMail(conf)
     await fm.send_message(message)
-
-    # Return response
-    return JSONResponse(status_code=200, content={"message": "Email has been sent successfully."})
