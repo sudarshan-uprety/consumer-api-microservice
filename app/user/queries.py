@@ -2,9 +2,9 @@ from pydantic import ValidationError
 from datetime import datetime
 
 from app.user.models import Users, UsedToken
-from app.utils.response import error_response
 from app.utils import jwt_token, OAuth2
 from utils import store
+from app.others.exceptions import GenericError
 
 
 def get_user_or_404(user_id):
@@ -14,10 +14,22 @@ def get_user_or_404(user_id):
         return user
 
     else:
-        return error_response(
+        raise GenericError(
             status_code=404,
             message='User not found'
         )
+
+
+def get_user_by_email_or_404(email):
+    user = Users.query.filter_by(email=email).first()
+    if user is None:
+        raise GenericError(
+            status_code=404,
+            message="User not found"
+        )
+
+    else:
+        return user
 
 
 def create_user(user):

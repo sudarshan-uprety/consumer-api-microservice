@@ -1,0 +1,51 @@
+from utils.constant import (ERROR_BAD_REQUEST,
+                            DATABASE_NOT_AVAILABLE_FOR_CONNECTION,
+                            ERROR_INTERNAL_SERVER_ERROR, SERVICE_UNAVAILABLE, UNPROCESSABLE_ENTITY)
+
+
+class ValidationError(Exception):
+    """Raised when pydantic error occurred."""
+
+    def __init__(self, message=None, status_code=422, *args, **kwargs):
+        self.message = message
+        self.status_code = status_code
+        super().__init__(self.status_code, self.message)
+
+
+class DatabaseConnectionProblem(Exception):
+    """Raised when connection cannot be made to the database."""
+
+    def __init__(self):
+        self.message = DATABASE_NOT_AVAILABLE_FOR_CONNECTION
+        self.status_code = SERVICE_UNAVAILABLE
+        super().__init__(self.status_code, self.message)
+
+        # raise DatabaseError(error=e.orig, code=e.code)
+
+
+class GenericError(Exception):
+    """The custom error that is raised when validation fail."""
+
+    def __init__(self, status_code: int = ERROR_BAD_REQUEST, message: str = None) -> None:
+        self.message = message
+        self.status_code = status_code
+        super().__init__(status_code, message)
+
+
+class InternalError(Exception):
+    """The main error handling that handles most of the exceptions"""
+
+    def __init__(self, status_code: int = ERROR_INTERNAL_SERVER_ERROR, message: str = None):
+        self.message = f'Sorry, something went wrong in our end: {message}'
+        self.status_code = status_code
+        super().__init__(status_code, message)
+
+
+class GenericWebsocketError(Exception):
+    """The custom error that is raised when validation fails in the websocket."""
+
+    def __init__(self, status_code: int = ERROR_BAD_REQUEST, message: str = None) -> None:
+        self.message = message
+        self.status_code = status_code
+        super().__init__(status_code, message)
+

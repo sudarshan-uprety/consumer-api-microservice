@@ -1,9 +1,10 @@
 from typing import Dict, Any
 
-from pydantic import BaseModel, EmailStr, root_validator
+from pydantic import BaseModel, EmailStr, root_validator, field_validator, ValidationError
 
 from app.user.models import Users
-from app.user.queries import get_user_or_404
+from app.user.queries import get_user_by_email_or_404
+from app.others import exceptions
 
 
 class UserRegister(BaseModel):
@@ -22,15 +23,15 @@ class UserRegister(BaseModel):
         email = values.get('email')
 
         if password and len(password) < 8:
-            raise ValueError('Password must be at least 8 characters long')
+            raise exceptions.ValidationError('Password must be at least 8 characters long')
         if password != confirm_password:
-            raise ValueError('Password and confirm password do not match')
+            raise exceptions.ValidationError('Password and confirm password do not match')
         if len(str(phone)) != 10:
-            raise ValueError('Phone must be 10 digits long')
+            raise exceptions.ValidationError('Phone must be 10 digits long')
 
         user = Users.query.filter_by(email=email).first()
         if user:
-            raise ValueError("Email already registered")
+            raise exceptions.ValidationError("Email already registered")
 
         return values
 
@@ -46,3 +47,14 @@ class UserRegisterResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+class UserLogin(BaseModel):
+    email: EmailStr
+    password: str
+
+
+class LoginResponse(BaseModel):
+    access_token: str
+    refresh_token: str
+    user: UserRegisterResponse
