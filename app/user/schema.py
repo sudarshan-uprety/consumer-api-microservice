@@ -1,9 +1,10 @@
+from datetime import datetime
 from typing import Dict, Any
 
-from pydantic import BaseModel, EmailStr, root_validator, field_validator, ValidationError
+from pydantic import BaseModel, EmailStr, root_validator
 
 from app.user.models import Users
-from app.others import exceptions
+from utils import exceptions
 
 
 class UserRegister(BaseModel):
@@ -77,3 +78,78 @@ class LoginResponse(BaseModel):
     access_token: str
     refresh_token: str
     user: UserRegisterResponse
+
+    class Config:
+        from_attributes = True
+
+
+class RefreshTokenRequest(BaseModel):
+    refresh_token: str
+
+
+class TokenResponse(BaseModel):
+    access_token: str
+
+
+class UserDetails(BaseModel):
+    id: int
+    full_name: str
+    email: EmailStr
+    created_at: datetime
+    phone: str
+
+    class Config:
+        from_attributes = True
+
+
+class EmailSchema(BaseModel):
+    email: EmailStr
+
+
+class ForgetPasswordRequest(BaseModel):
+    password: str
+    confirm_password: str
+    token: str
+
+    @root_validator(pre=True)
+    def password_valid(cls, values):
+        password = values.get('password')
+        confirm_password = values.get('confirm_password')
+        if len(password) < 8:
+            raise exceptions.GenericError(
+                message='Password must be at least 8 characters long.',
+                status_code=400
+            )
+        if password != confirm_password:
+            raise exceptions.GenericError(
+                message='Password and confirm_password must be the same.',
+                status_code=400
+            )
+        return values
+
+
+class ChangePasswordRequest(BaseModel):
+    current_password: str
+    new_password: str
+    confirm_password: str
+
+    @root_validator(pre=True)
+    def password_valid(cls, values):
+        new_password = values.get('new_password')
+        confirm_password = values.get('confirm_password')
+        if len(new_password) < 8:
+            raise exceptions.GenericError(
+                message='Password must be at least 8 characters long.',
+                status_code=400
+            )
+        if new_password != confirm_password:
+            raise exceptions.GenericError(
+                message='Password and confirm_password must be the same.',
+                status_code=400
+            )
+        return values
+
+
+class TokenPayload(BaseModel):
+    sub: str
+    exp: int

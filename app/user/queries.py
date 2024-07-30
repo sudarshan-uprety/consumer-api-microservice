@@ -1,10 +1,8 @@
-from pydantic import ValidationError
 from datetime import datetime
 
 from app.user.models import Users, UsedToken
-from app.utils import jwt_token, OAuth2
-from utils import store
-from app.others.exceptions import GenericError
+from utils import store, jwt_token, OAuth2
+from utils.exceptions import GenericError
 
 
 def get_user_or_404(user_id):
@@ -23,15 +21,14 @@ def get_user_or_404(user_id):
 def get_user_by_email_or_404(email):
     user = Users.query.filter_by(email=email).first()
 
-    if user is None:
+    if user and not user.is_deleted and user.is_active:
+        return user
+    else:
         raise GenericError(
             status_code=404,
             message="User not found",
             errors={'email': f'{email} not found'}
         )
-
-    else:
-        return user
 
 
 def create_user(user):
@@ -56,10 +53,12 @@ def verify_user(token):
     check_used_token(token=token)
     user = OAuth2.get_current_user(token=token)
     if user.is_active:
-        raise ValidationError('User is already active.')
+        raise GenericError(
+            message='User is already active.',
+            status_code=409
+        )
     user.is_active = True
     store.session.commit()
-    store.session.refresh(user)
 
     # now save the used token to the table
     token_data = {
@@ -70,3 +69,8 @@ def verify_user(token):
     store.session.add(used_token)
     store.session.commit()
 
+
+def change_password(user, password):
+    hashed_password = jwt_token.get_hashed_password(password)
+    user.password = hashed_password
+    store.session.commit()
