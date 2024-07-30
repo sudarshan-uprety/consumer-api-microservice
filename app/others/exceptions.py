@@ -1,6 +1,7 @@
 from utils.constant import (ERROR_BAD_REQUEST,
                             DATABASE_NOT_AVAILABLE_FOR_CONNECTION,
-                            ERROR_INTERNAL_SERVER_ERROR, SERVICE_UNAVAILABLE, UNPROCESSABLE_ENTITY)
+                            ERROR_INTERNAL_SERVER_ERROR, SERVICE_UNAVAILABLE)
+from typing import Dict, List, Optional, Union
 
 
 class ValidationError(Exception):
@@ -24,12 +25,14 @@ class DatabaseConnectionProblem(Exception):
 
 
 class GenericError(Exception):
-    """The custom error that is raised when validation fail."""
+    """The custom error that is raised when validation fails."""
 
-    def __init__(self, status_code: int = ERROR_BAD_REQUEST, message: str = None) -> None:
-        self.message = message
+    def __init__(self, status_code: int = ERROR_BAD_REQUEST, message: Optional[str] = None,
+                 errors: Optional[dict] = None, *args, **kwargs) -> None:
         self.status_code = status_code
-        super().__init__(status_code, message)
+        self.message = message
+        self.errors = errors
+        super().__init__(message)
 
 
 class InternalError(Exception):

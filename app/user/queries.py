@@ -22,10 +22,12 @@ def get_user_or_404(user_id):
 
 def get_user_by_email_or_404(email):
     user = Users.query.filter_by(email=email).first()
+
     if user is None:
         raise GenericError(
             status_code=404,
-            message="User not found"
+            message="User not found",
+            errors={'email': f'{email} not found'}
         )
 
     else:
