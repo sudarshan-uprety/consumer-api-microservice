@@ -6,4 +6,4 @@ echo "Starting authentication service"
 alembic upgrade head
 
 # Start the application with the appropriate port
-uvicorn main:app --host 0.0.0.0 --port 5000
+uvicorn main:server --host 0.0.0.0 --port 5000
