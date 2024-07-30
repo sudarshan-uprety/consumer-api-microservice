@@ -1,15 +1,15 @@
 from typing import Dict, Any
 
-from pydantic import BaseModel, EmailStr, root_validator
+from pydantic import BaseModel, EmailStr, root_validator, field_validator, ValidationError
 
 from app.user.models import Users
-from app.user.queries import get_user_or_404
+from app.others import exceptions
 
 
 class UserRegister(BaseModel):
     email: EmailStr
     full_name: str
-    phone: int
+    phone: str
     address: str
     password: str
     confirm_password: str
@@ -22,15 +22,35 @@ class UserRegister(BaseModel):
         email = values.get('email')
 
         if password and len(password) < 8:
-            raise ValueError('Password must be at least 8 characters long')
+            raise exceptions.GenericError(
+                message='Password must be at least 8 characters long.',
+                status_code=400
+            )
+
         if password != confirm_password:
-            raise ValueError('Password and confirm password do not match')
-        if len(str(phone)) != 10:
-            raise ValueError('Phone must be 10 digits long')
+            raise exceptions.GenericError(
+                message='Password and confirm_password must be the same.',
+                status_code=400
+            )
+
+        if len(phone) != 10:
+            raise exceptions.GenericError(
+                message='Phone number must be 10 characters long.',
+                status_code=400
+            )
+
+        phone = Users.query.filter_by(phone=phone).first()
+        if phone is not None:
+            raise exceptions.GenericError(
+                message='Phone number already exists.',
+                status_code=400)
 
         user = Users.query.filter_by(email=email).first()
-        if user:
-            raise ValueError("Email already registered")
+        if user is not None:
+            raise exceptions.GenericError(
+                message='Email already registered.',
+                status_code=400
+            )
 
         return values
 
@@ -46,3 +66,14 @@ class UserRegisterResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+class UserLogin(BaseModel):
+    email: EmailStr
+    password: str
+
+
+class LoginResponse(BaseModel):
+    access_token: str
+    refresh_token: str
+    user: UserRegisterResponse

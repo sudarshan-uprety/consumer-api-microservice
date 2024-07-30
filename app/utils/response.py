@@ -1,51 +1,44 @@
-import json
-import math
+from typing import Dict, List, Optional, Union
+
+from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 
+from utils.constant import ERROR_BAD_REQUEST, SUCCESS
 
 headers = {
-    "Content-Type": "application/json",
-    "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Credentials": True,
+    'Content-Type': 'application/json',
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Credentials': 'true',
 }
 
 
-def success_response(status_code, message, data, warning: str = None):
+def response(data: Optional[Union[Dict, List]], success: bool, message: Optional[str], status_code: int,
+             errors: Optional[Union[Dict, List]] = None, warning: Optional[str] = None, **kwargs):
+    content = {
+        "message": message,
+        "success": success,
+        "data": data,
+    }
+
+    if success:
+        content["warning"] = warning
+    else:
+        content["errors"] = errors
+
     return JSONResponse(
+        content=jsonable_encoder(content, **kwargs),
         status_code=status_code,
-        content={
-            "success": True,
-            "message": message,
-            "data": data,
-            "status_code": status_code,
-            'warning': warning
-        }
+        headers=headers
     )
 
 
-def error_response(status_code, message, errors=[]):
-    return JSONResponse(
-        status_code=status_code,
-        content={
-            "success": False,
-            "message": message,
-            "data": None,
-            "errors": errors
-        }
-    )
+def success(status_code=SUCCESS, message: Optional[str] = None, data: Optional[Union[Dict, List]] = None,
+            warning: Optional[str] = None, **kwargs):
+    return response(data=data, success=True, message=message, status_code=status_code,
+                    warning=warning, **kwargs)
 
 
-# def respond_error(data, success, message, status_code, errors=[]):
-#     body = {"message": message, "success": success, "data": data, "errors": errors}
-#     return {"statusCode": status_code, "headers": headers, "body": json.dumps(body)}
-#
-#
-# def respond_success(data, success, message, status_code, warning=None, total_page=None, current_page=None):
-#     if total_page and current_page:
-#         data = {
-#             "total_pages": math.ceil(total_page),
-#             "current_page": current_page,
-#             "data": data,
-#         }
-#     body = {"message": message, "success": success, "data": data, "warning": warning}
-#     return {"statusCode": status_code, "headers": headers, "body": json.dumps(body)}
+def error(status_code=ERROR_BAD_REQUEST, message: Optional[str] = None,
+          errors: Optional[dict] = None, data: Optional[Union[Dict, List]] =None , **kwargs):
+    return response(data=data, success=False, message=message, status_code=status_code,
+                    errors=errors, **kwargs)

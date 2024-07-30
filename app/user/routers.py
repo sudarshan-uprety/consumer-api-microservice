@@ -1,5 +1,5 @@
 from fastapi import status, APIRouter, BackgroundTasks, Path
-from app.user.schema import UserRegister, UserRegisterResponse
+from app.user.schema import *
 from app.user.models import Users
 from app.utils import jwt_token
 from app.utils import email, response
@@ -17,7 +17,7 @@ async def signup(user: UserRegister, background_tasks: BackgroundTasks
     user = create_user(user=user)
     background_tasks.add_task(email.send_register_mail, user=user, token=jwt_token.create_access_token(user.email))
     data = UserRegisterResponse.from_orm(user)
-    return response.success_response(
+    return response.success(
         status_code=status.HTTP_201_CREATED,
         message='User created successfully, please check your email for verification.',
         data=data.dict(),
@@ -28,9 +28,16 @@ async def signup(user: UserRegister, background_tasks: BackgroundTasks
 @router.get('/verify/user/{token}', status_code=status.HTTP_200_OK)
 async def verify_email(token: str = Path(..., description="Verification token")):
     verify = verify_user(token=token)
-    return response.success_response(
+    return response.success(
         status_code=status.HTTP_200_OK,
         message='Email verified successfully.',
         data=None,
         warning=None
     )
+
+
+@router.post('/login', status_code=status.HTTP_200_OK, response_model=LoginResponse)
+async def login(user_in: UserLogin):
+    user = get_user_by_email_or_404(user_in.email)
+    print('user is', user)
+
