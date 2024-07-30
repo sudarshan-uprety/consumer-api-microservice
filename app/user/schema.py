@@ -3,8 +3,8 @@ from typing import Dict, Any
 
 from pydantic import BaseModel, EmailStr, root_validator
 
-from app.others import exceptions
 from app.user.models import Users
+from utils import exceptions
 
 
 class UserRegister(BaseModel):
@@ -148,3 +148,8 @@ class ChangePasswordRequest(BaseModel):
                 status_code=400
             )
         return values
+
+
+class TokenPayload(BaseModel):
+    sub: str
+    exp: int

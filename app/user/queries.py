@@ -1,9 +1,8 @@
 from datetime import datetime
 
-from app.others.exceptions import GenericError
 from app.user.models import Users, UsedToken
-from app.utils import jwt_token, OAuth2
-from utils import store
+from utils import store, jwt_token, OAuth2
+from utils.exceptions import GenericError
 
 
 def get_user_or_404(user_id):

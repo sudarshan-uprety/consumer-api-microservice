@@ -4,10 +4,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.exc import OperationalError, PendingRollbackError
 from starlette.middleware.base import BaseHTTPMiddleware
 
-from app.others import exceptions
 from app.user.routers import router
-from app.utils import middleware
-from app.utils import response, constant
+from utils import response, constant, exceptions, middleware
 from utils.database import connect_to_database, disconnect_from_database, rollback_session
 
 

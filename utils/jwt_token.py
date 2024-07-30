@@ -5,7 +5,7 @@ from fastapi import status
 from jose import jwt
 from passlib.context import CryptContext
 
-from app.others import exceptions
+from utils import exceptions
 from utils.variables import (ACCESS_TOKEN_EXPIRE_MINUTES, JWT_REFRESH_SECRET_KEY, ALGORITHM, JWT_SECRET_KEY,
                              REFRESH_TOKEN_EXPIRE_MINUTES)
 

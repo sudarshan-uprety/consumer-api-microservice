@@ -2,7 +2,7 @@ from fastapi import status, APIRouter, BackgroundTasks, Path, Depends
 
 from app.user.queries import *
 from app.user.schema import *
-from app.utils import email, response, jwt_token, OAuth2
+from utils import response, jwt_token, OAuth2, email
 
 router = APIRouter(
     prefix="/accounts",

@@ -5,9 +5,9 @@ from fastapi import Depends
 from fastapi.security import OAuth2PasswordBearer
 from jose import jwt
 
-from app.others import exceptions
-from app.schema.schemas import TokenPayload
 from app.user.models import Users
+from app.user.schema import TokenPayload
+from utils import exceptions
 from utils.variables import ALGORITHM, JWT_SECRET_KEY
 
 reusable_oauth = OAuth2PasswordBearer(
