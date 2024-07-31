@@ -5,7 +5,7 @@ from sqlalchemy.exc import OperationalError, PendingRollbackError
 from starlette.middleware.base import BaseHTTPMiddleware
 
 from app.user.routers import router
-from utils import response, constant, exceptions, middleware
+from utils import response, constant, exceptions, middleware, helpers
 from utils.database import connect_to_database, disconnect_from_database, rollback_session
 
 
@@ -59,7 +59,9 @@ server.add_middleware(BaseHTTPMiddleware, dispatch=middleware.log_middleware)
 
 @server.exception_handler(RequestValidationError)
 async def validation_exception_handler(_, exception):
-    return response.error(constant.UNPROCESSABLE_ENTITY, exception.errors())
+    errors = helpers.pydantic_error(exception.errors())['body']
+    msg = "Invalid data."
+    return response.error(constant.UNPROCESSABLE_ENTITY, msg, errors)
 
 
 @server.exception_handler(OperationalError)

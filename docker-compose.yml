@@ -1,6 +1,12 @@
 version: '3'
 
 services:
+  redis-server:
+    image: redis:latest
+    restart: unless-stopped
+    volumes:
+      - redis-data:/data
+
   auth_db_dev:
     image: postgres:latest
     restart: always
@@ -20,6 +26,7 @@ services:
     restart: always
     depends_on:
       - auth_db_dev
+      - redis-server
     ports:
       - "9001:5000"
     environment:
@@ -45,6 +52,7 @@ services:
     restart: always
     depends_on:
       - auth_db_uat
+      - redis-server
     ports:
       - "9002:5000"
     environment:
@@ -70,6 +78,7 @@ services:
     restart: always
     depends_on:
       - auth_db_prod
+      - redis-server
     ports:
       - "9000:5000"
     environment:
@@ -80,3 +89,4 @@ volumes:
   postgres_data_dev:
   postgres_data_uat:
   postgres_data_prod:
+  redis-data:
