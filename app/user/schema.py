@@ -69,6 +69,11 @@ class UserRegisterResponse(BaseModel):
         from_attributes = True
 
 
+class OTPVerification(BaseModel):
+    email: EmailStr
+    otp: str
+
+
 class UserLogin(BaseModel):
     email: EmailStr
     password: str
@@ -107,9 +112,10 @@ class EmailSchema(BaseModel):
 
 
 class ForgetPasswordRequest(BaseModel):
+    email: EmailStr
     password: str
     confirm_password: str
-    token: str
+    otp: str
 
     @root_validator(pre=True)
     def password_valid(cls, values):

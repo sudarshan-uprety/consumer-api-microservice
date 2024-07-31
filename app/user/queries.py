@@ -1,7 +1,7 @@
-from datetime import datetime
+from pydantic import EmailStr
 
-from app.user.models import Users, UsedToken
-from utils import store, jwt_token, OAuth2
+from app.user.models import Users
+from utils import store, jwt_token
 from utils.exceptions import GenericError
 
 
@@ -37,36 +37,26 @@ def create_user(user):
     user_data['password'] = hashed_password
     user_data.pop('confirm_password', None)
     new_user = Users(**user_data)
-    new_user.is_active = True
+    # new_user.is_active = True
     store.session.add(new_user)
     store.session.commit()
     return new_user
 
 
-def check_used_token(token):
-    token = UsedToken.query.filter_by(token=token).first()
-    if token is not None:
-        raise ValueError("Token already used.")
+# def check_used_token(token):
+#     token = UsedToken.query.filter_by(token=token).first()
+#     if token is not None:
+#         raise ValueError("Token already used.")
 
 
-def verify_user(token):
-    check_used_token(token=token)
-    user = OAuth2.get_current_user(token=token)
+def verify_user(email: EmailStr):
+    user = Users.query.filter_by(email=email).first()
     if user.is_active:
         raise GenericError(
             message='User is already active.',
             status_code=409
         )
     user.is_active = True
-    store.session.commit()
-
-    # now save the used token to the table
-    token_data = {
-        'token': token,
-        'used_at': datetime.utcnow()
-    }
-    used_token = UsedToken(**token_data)
-    store.session.add(used_token)
     store.session.commit()
 
 
