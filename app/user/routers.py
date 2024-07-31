@@ -1,8 +1,10 @@
-from fastapi import status, APIRouter, BackgroundTasks, Path, Depends
+from fastapi import status, APIRouter, BackgroundTasks, Depends
 
 from app.user.queries import *
 from app.user.schema import *
+from app.user.utils import verify_signup_otp, verify_forget_password_otp
 from utils import response, jwt_token, OAuth2, email
+from utils.otp import otp
 
 router = APIRouter(
     prefix="/accounts",
@@ -13,7 +15,7 @@ router = APIRouter(
 @router.post('/signup', status_code=status.HTTP_201_CREATED, response_model=UserRegisterResponse)
 async def signup(user: UserRegister, background_tasks: BackgroundTasks = BackgroundTasks()) -> UserRegisterResponse:
     user = create_user(user=user)
-    background_tasks.add_task(email.send_register_mail, user=user, token=jwt_token.create_access_token(user.email))
+    background_tasks.add_task(email.send_register_mail, user=user, otp=otp.generate_otp(user_email=user.email))
     data = UserRegisterResponse.from_orm(user)
     return response.success(
         status_code=status.HTTP_201_CREATED,
@@ -23,9 +25,9 @@ async def signup(user: UserRegister, background_tasks: BackgroundTasks = Backgro
     )
 
 
-@router.get('/verify/user/{token}', status_code=status.HTTP_200_OK)
-async def verify_email(token: str = Path(..., description="Verification token")) -> dict:
-    verify_user(token=token)
+@router.post('/verify/top/', status_code=status.HTTP_200_OK)
+async def verify_email(data: OTPVerification) -> dict:
+    verify_signup_otp(code=data.otp, email=data.email)
     return response.success(
         status_code=status.HTTP_200_OK,
         message='Email verified successfully.',
@@ -79,11 +81,11 @@ async def get_me(user: Users = Depends(OAuth2.get_current_user)) -> UserDetails:
 @router.post('/forget/password')
 async def forget_password(user_email: EmailSchema, background_tasks: BackgroundTasks = BackgroundTasks()) -> dict:
     user = get_user_by_email_or_404(user_email.email)
-    token = jwt_token.create_access_token(user.email)
-    background_tasks.add_task(email.send_forget_password_mail, user=user, token=token)
+    code = otp.generate_otp(user_email=user.email)
+    background_tasks.add_task(email.send_forget_password_mail, user=user, code=code)
     return response.success(
         status_code=status.HTTP_200_OK,
-        message='Password reset email sent, please check your email for verification.',
+        message='Forget password email with OTP has been sent.',
         data=None,
         warning=None
     )
@@ -91,14 +93,14 @@ async def forget_password(user_email: EmailSchema, background_tasks: BackgroundT
 
 @router.post('/validate/forget/password')
 async def forget_password_validate(data: ForgetPasswordRequest):
-    user = OAuth2.get_current_user(token=data.token)
-    check_used_token(token=data.token)
+    user = get_user_by_email_or_404(data.email)
+    verify_forget_password_otp(code=data.otp, email=data.email)
     change_password(user=user, password=data.password)
     return response.success(
         status_code=status.HTTP_200_OK,
         message='Password changed successfully',
         data=None,
-        warning=None
+        warning=f"Password changed successfully for user {user.email}"
     )
 
 
