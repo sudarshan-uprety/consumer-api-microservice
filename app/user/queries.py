@@ -19,16 +19,22 @@ def get_user_or_404(user_id):
 
 
 def get_user_by_email_or_404(email):
-    user = Users.query.filter_by(email=email).first()
+    user = Users.query.filter_by(email=email, is_deleted=False).first()
 
-    if user and not user.is_deleted and user.is_active:
-        return user
-    else:
+    if not user:
         raise GenericError(
             status_code=404,
             message="User not found",
             errors={'email': f'{email} not found'}
         )
+
+    if not user.is_active:
+        raise GenericError(
+            status_code=404,
+            message='User not active'
+        )
+
+    return user
 
 
 def get_user_by_phone_or_404(phone):
