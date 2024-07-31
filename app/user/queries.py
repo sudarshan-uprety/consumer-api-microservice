@@ -31,13 +31,35 @@ def get_user_by_email_or_404(email):
         )
 
 
+def get_user_by_phone_or_404(phone):
+    user = Users.query.filter_by(phone=phone).first()
+
+    if user and not user.is_deleted:
+        raise GenericError(
+            status_code=404,
+            message="Phone number already registered.",
+            errors={'phone': f'{phone} already registered.'}
+        )
+    else:
+        return user
+
+
+def check_existing_user(email):
+    user = Users.query.filter_by(email=email).first()
+    if user and not user.is_deleted:
+        raise GenericError(
+            status_code=409,
+            message=f'User with email {email} already exists',
+        )
+
+
 def create_user(user):
     hashed_password = jwt_token.get_hashed_password(user.password)
     user_data = user.dict()
     user_data['password'] = hashed_password
     user_data.pop('confirm_password', None)
     new_user = Users(**user_data)
-    # new_user.is_active = True
+    new_user.is_active = True
     store.session.add(new_user)
     store.session.commit()
     return new_user

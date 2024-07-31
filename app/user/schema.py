@@ -1,9 +1,8 @@
 from datetime import datetime
-from typing import Dict, Any
 
-from pydantic import BaseModel, EmailStr, root_validator
+from pydantic import BaseModel, EmailStr, field_validator
 
-from app.user.models import Users
+from app.user.queries import get_user_by_phone_or_404, check_existing_user
 from utils import exceptions
 
 
@@ -15,45 +14,38 @@ class UserRegister(BaseModel):
     password: str
     confirm_password: str
 
-    @root_validator(pre=True)
-    def validate_all(cls, values: Dict[str, Any]) -> Dict[str, Any]:
-        password = values.get('password')
-        confirm_password = values.get('confirm_password')
-        phone = values.get('phone')
-        email = values.get('email')
-
-        if password and len(password) < 8:
+    @field_validator('password')
+    def validate_password(cls, value):
+        if len(value) < 8:
             raise exceptions.GenericError(
-                message='Password must be at least 8 characters long.',
+                message='Password must be at least 8 characters long',
                 status_code=400
             )
+        return value
 
-        if password != confirm_password:
+    @field_validator('confirm_password')
+    def passwords_match(cls, value, values):
+        if value != values.data.get('password'):
             raise exceptions.GenericError(
-                message='Password and confirm_password must be the same.',
+                message='Password and confirm_password must be same must match',
                 status_code=400
             )
+        return value
 
-        if len(phone) != 10:
+    @field_validator('phone')
+    def validate_phone(cls, value):
+        if len(value) < 10:
             raise exceptions.GenericError(
-                message='Phone number must be 10 characters long.',
+                message='Phone must be at least 10 characters long',
                 status_code=400
             )
+        phone = get_user_by_phone_or_404(phone=value)
+        return value
 
-        phone = Users.query.filter_by(phone=phone).first()
-        if phone is not None:
-            raise exceptions.GenericError(
-                message='Phone number already exists.',
-                status_code=400)
-
-        user = Users.query.filter_by(email=email).first()
-        if user is not None:
-            raise exceptions.GenericError(
-                message='Email already registered.',
-                status_code=400
-            )
-
-        return values
+    @field_validator('email')
+    def validate_email(cls, value):
+        check_existing_user(value)
+        return value
 
     class Config:
         from_attributes = True
@@ -117,21 +109,31 @@ class ForgetPasswordRequest(BaseModel):
     confirm_password: str
     otp: str
 
-    @root_validator(pre=True)
-    def password_valid(cls, values):
-        password = values.get('password')
-        confirm_password = values.get('confirm_password')
-        if len(password) < 8:
+    @field_validator('password')
+    def validate_password(cls, value):
+        if len(value) < 8:
             raise exceptions.GenericError(
-                message='Password must be at least 8 characters long.',
+                message='Password must be at least 8 characters long',
                 status_code=400
             )
-        if password != confirm_password:
+        return value
+
+    @field_validator('confirm_password')
+    def passwords_match(cls, value, values):
+        if value != values.data.get('password'):
             raise exceptions.GenericError(
-                message='Password and confirm_password must be the same.',
+                message='Password and confirm_password must be same must match',
                 status_code=400
             )
-        return values
+        return value
+
+    @field_validator('otp')
+    def validate_otp(cls, value):
+        if len(value) < 4 or len(value) > 4:
+            raise exceptions.GenericError(
+                message='OTP must be 4 characters long',
+                status_code=400
+            )
 
 
 class ChangePasswordRequest(BaseModel):
@@ -139,21 +141,23 @@ class ChangePasswordRequest(BaseModel):
     new_password: str
     confirm_password: str
 
-    @root_validator(pre=True)
-    def password_valid(cls, values):
-        new_password = values.get('new_password')
-        confirm_password = values.get('confirm_password')
-        if len(new_password) < 8:
+    @field_validator('new_password')
+    def validate_password(cls, value):
+        if len(value) < 8:
             raise exceptions.GenericError(
-                message='Password must be at least 8 characters long.',
+                message='Password must be at least 8 characters long',
                 status_code=400
             )
-        if new_password != confirm_password:
+        return value
+
+    @field_validator('confirm_password')
+    def passwords_match(cls, value, values):
+        if value != values.data.get('new_password'):
             raise exceptions.GenericError(
-                message='Password and confirm_password must be the same.',
+                message='Password and confirm_password must be same must match',
                 status_code=400
             )
-        return values
+        return value
 
 
 class TokenPayload(BaseModel):
