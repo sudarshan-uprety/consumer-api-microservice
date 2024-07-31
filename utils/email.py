@@ -15,12 +15,10 @@ conf = ConnectionConfig(
 )
 
 
-async def send_register_mail(user: Users, token: str):
+async def send_register_mail(user: Users, otp: str):
     # HTML template for the email body
     template = templates.get_template(f'register.html')
-    render_content = template.render(name=f'{user.full_name}', verification_url
-    =f'{ROOT_URL}/accounts/verify/user/{token}')
-
+    render_content = template.render(name=f'{user.full_name}', otp=otp)
     # Create message schema
     message = MessageSchema(
         subject="Verification email",
@@ -34,12 +32,12 @@ async def send_register_mail(user: Users, token: str):
     await fm.send_message(message)
 
 
-async def send_forget_password_mail(user: Users, token: str):
+async def send_forget_password_mail(user: Users, code: str):
     # HTML template for the email body
     template = templates.get_template(f'forget_password.html')
     render_content = template.render(
         name=f'{user.full_name}',
-        verify_link=f'{ROOT_URL}/accounts/forget/password/{token}'
+        otp=code
     )
 
     # Create message schema
