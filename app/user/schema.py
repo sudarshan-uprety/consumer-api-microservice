@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Optional
 
 from pydantic import BaseModel, EmailStr, field_validator
 
@@ -163,3 +164,12 @@ class ChangePasswordRequest(BaseModel):
 class TokenPayload(BaseModel):
     sub: str
     exp: int
+
+
+class UpdateUserDetails(BaseModel):
+    full_name: Optional[str] = None
+    phone: Optional[str] = None
+    address: Optional[str] = None
+
+    class Config:
+        from_attributes = True

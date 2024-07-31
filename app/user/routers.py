@@ -116,3 +116,14 @@ async def change_user_password(data: ChangePasswordRequest,
         data=None,
         warning=None
     )
+
+
+@router.put('/update')
+async def update_user_details(data: UpdateUserDetails, current_user: Users = Depends(OAuth2.get_current_user)) -> dict:
+    update_user(user=current_user, data=data)
+    return response.success(
+        status_code=status.HTTP_200_OK,
+        message='User details updated successfully',
+        data=None,
+        warning=None
+    )

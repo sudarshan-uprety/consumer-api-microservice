@@ -71,6 +71,13 @@ def create_user(user):
     return new_user
 
 
+def update_user(user, data):
+    updated_user = data.dict(exclude_none=True)
+    for field, value in updated_user.items():
+        setattr(user, field, value)
+    store.session.commit()
+
+
 # def check_used_token(token):
 #     token = UsedToken.query.filter_by(token=token).first()
 #     if token is not None:
