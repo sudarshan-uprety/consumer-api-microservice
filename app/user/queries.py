@@ -19,15 +19,43 @@ def get_user_or_404(user_id):
 
 
 def get_user_by_email_or_404(email):
-    user = Users.query.filter_by(email=email).first()
+    user = Users.query.filter_by(email=email, is_deleted=False).first()
 
-    if user and not user.is_deleted and user.is_active:
-        return user
-    else:
+    if not user:
         raise GenericError(
             status_code=404,
             message="User not found",
             errors={'email': f'{email} not found'}
+        )
+
+    if not user.is_active:
+        raise GenericError(
+            status_code=404,
+            message='User not active'
+        )
+
+    return user
+
+
+def get_user_by_phone_or_404(phone):
+    user = Users.query.filter_by(phone=phone).first()
+
+    if user and not user.is_deleted:
+        raise GenericError(
+            status_code=404,
+            message="Phone number already registered.",
+            errors={'phone': f'{phone} already registered.'}
+        )
+    else:
+        return user
+
+
+def check_existing_user(email):
+    user = Users.query.filter_by(email=email).first()
+    if user and not user.is_deleted:
+        raise GenericError(
+            status_code=409,
+            message=f'User with email {email} already exists',
         )
 
 
@@ -37,10 +65,17 @@ def create_user(user):
     user_data['password'] = hashed_password
     user_data.pop('confirm_password', None)
     new_user = Users(**user_data)
-    # new_user.is_active = True
+    new_user.is_active = True
     store.session.add(new_user)
     store.session.commit()
     return new_user
+
+
+def update_user(user, data):
+    updated_user = data.dict(exclude_none=True)
+    for field, value in updated_user.items():
+        setattr(user, field, value)
+    store.session.commit()
 
 
 # def check_used_token(token):

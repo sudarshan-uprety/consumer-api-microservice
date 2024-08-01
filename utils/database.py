@@ -1,11 +1,12 @@
 from sqlalchemy import create_engine
+from sqlalchemy.exc import OperationalError
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, scoped_session
 from sqlalchemy.pool import StaticPool
-from sqlalchemy.exc import OperationalError
+
+from utils import store
 from utils.constant import *
 from utils.variables import DATABASE_URL
-from utils import store
 
 # Create the base class for declarative models
 Base = declarative_base()
@@ -18,7 +19,8 @@ def attach_query_property():
 
 def register_models():
     """Register all models to be used with SQLAlchemy."""
-    from app.user.models import Users
+    from app.user.models import Users  # noqa: F401
+    from app.payments.models import UserPayment  # noqa: F401
 
 
 def connect_to_database() -> bool:
