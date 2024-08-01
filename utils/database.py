@@ -19,6 +19,8 @@ def attach_query_property():
 
 def register_models():
     """Register all models to be used with SQLAlchemy."""
+    from app.user.models import Users  # noqa: F401
+    from app.payments.models import UserPayment  # noqa: F401
 
 
 def connect_to_database() -> bool:

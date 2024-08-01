@@ -25,7 +25,7 @@ async def signup(user: UserRegister, background_tasks: BackgroundTasks = Backgro
     )
 
 
-@router.post('/verify/top/', status_code=status.HTTP_200_OK)
+@router.post('/verify/otp/', status_code=status.HTTP_200_OK)
 async def verify_email(data: OTPVerification) -> dict:
     verify_signup_otp(code=data.otp, email=data.email)
     return response.success(
