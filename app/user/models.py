@@ -6,6 +6,7 @@ from sqlalchemy import (
     UniqueConstraint,
     PrimaryKeyConstraint
 )
+from sqlalchemy.orm import relationship
 from sqlalchemy_serializer import SerializerMixin
 
 from app.common.models import Common
@@ -23,6 +24,8 @@ class Users(Base, Common, SerializerMixin):
     password = Column(String, nullable=False)
     address = Column(String(225), nullable=False)
     is_active = Column(Boolean, default=False)
+
+    payments = relationship("UserPayment", back_populates="user")
 
     UniqueConstraint("email", name="uq_user_email")
     PrimaryKeyConstraint("id", name="pk_user_id")

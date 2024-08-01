@@ -25,7 +25,7 @@ async def signup(user: UserRegister, background_tasks: BackgroundTasks = Backgro
     )
 
 
-@router.post('/verify/top/', status_code=status.HTTP_200_OK)
+@router.post('/verify/otp/', status_code=status.HTTP_200_OK)
 async def verify_email(data: OTPVerification) -> dict:
     verify_signup_otp(code=data.otp, email=data.email)
     return response.success(
@@ -113,6 +113,17 @@ async def change_user_password(data: ChangePasswordRequest,
     return response.success(
         status_code=status.HTTP_200_OK,
         message='Password changed successfully',
+        data=None,
+        warning=None
+    )
+
+
+@router.put('/update')
+async def update_user_details(data: UpdateUserDetails, current_user: Users = Depends(OAuth2.get_current_user)) -> dict:
+    update_user(user=current_user, data=data)
+    return response.success(
+        status_code=status.HTTP_200_OK,
+        message='User details updated successfully',
         data=None,
         warning=None
     )
