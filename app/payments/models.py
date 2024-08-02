@@ -3,6 +3,7 @@ from sqlalchemy import (
     String,
     Integer,
     Float,
+    Boolean,
     ForeignKey,
     PrimaryKeyConstraint
 )
@@ -22,6 +23,7 @@ class UserPayment(Base, Common, SerializerMixin):
     payment_id = Column(String, nullable=False)
     payment_method = Column(String, nullable=False)
     payment_amount = Column(Float, nullable=False)
+    payment_status = Column(Boolean, nullable=False)
     order_id = Column(String, nullable=False)
 
     PrimaryKeyConstraint("id", name="pk_payment_id")

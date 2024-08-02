@@ -12,6 +12,12 @@ class PaymentSchema(BaseModel):
         from_attributes = True
 
 
+class TransactionDetails(BaseModel):
+    token: str
+    amount: int
+    order_details: dict
+
+
 class PaymentResponseSchema(BaseModel):
     id: int
     payment_id: str
