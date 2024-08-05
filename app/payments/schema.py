@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 
+from app.orders.schemas import OrderBase
 from app.user.schema import UserDetails
 
 
@@ -20,7 +21,7 @@ class TransactionDetails(BaseModel):
     product_code: str
     signed_field_names: str
     signature: str
-    order_details: dict
+    order_details: OrderBase
 
 
 class PaymentResponseSchema(BaseModel):

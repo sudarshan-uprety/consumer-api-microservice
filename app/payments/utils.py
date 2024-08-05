@@ -14,8 +14,7 @@ def validate_payment(data: TransactionDetails):
     response_data = requests.get(request_url).json()
     if response_data['status'] == 'COMPLETE':
         print(response_data)
-        print("Payment successful.")
-        # data = response_data.json()
+        print(data.order_details)
     else:
         raise GenericError(
             message="Invalid payment.",
