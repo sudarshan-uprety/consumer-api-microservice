@@ -29,6 +29,7 @@ class UserPayment(Base, Common, SerializerMixin):
     PrimaryKeyConstraint("id", name="pk_payment_id")
 
     user = relationship("Users", back_populates="payments")
+    orders = relationship("Orders", back_populates="payment")
 
     class Config:
         orm_mode = True

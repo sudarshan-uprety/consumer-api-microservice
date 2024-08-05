@@ -4,4 +4,4 @@ from app.user.models import Users
 
 
 def create_payment(payment: TransactionDetails, user: Users) -> UserPayment:
-    pass
+    print('payment is', payment.order_details)

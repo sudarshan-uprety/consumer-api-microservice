@@ -6,6 +6,7 @@ from utils import store
 
 def create_order(orders: ProductOrder, user: Users):
     for order in orders:
+        print('order is', order)
         order_data = order.dict()
         order_data['user_id'] = user.id
         order_obj = Orders(**order_data)
