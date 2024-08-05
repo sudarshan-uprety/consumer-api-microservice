@@ -13,8 +13,13 @@ class PaymentSchema(BaseModel):
 
 
 class TransactionDetails(BaseModel):
-    token: str
-    amount: int
+    transaction_code: str
+    status: str
+    total_amount: float
+    transaction_uuid: str
+    product_code: str
+    signed_field_names: str
+    signature: str
     order_details: dict
 
 
