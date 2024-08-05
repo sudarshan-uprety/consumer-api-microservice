@@ -14,7 +14,7 @@ router = APIRouter(
 
 @router.post('/create', status_code=status.HTTP_200_OK)
 async def create_user_payment(data: TransactionDetails, user: Users = Depends(OAuth2.get_current_user)):
-    validate_payment(data=data)
+    validate_payment(data=data, user=user)
     payment = create_payment(payment=data, user=user)
     return response.success(
         message='Payment created successfully',

@@ -26,7 +26,7 @@ class Users(Base, Common, SerializerMixin):
     is_active = Column(Boolean, default=False)
 
     payments = relationship("UserPayment", back_populates="user")
-
+    orders = relationship("Orders", back_populates="user")
     UniqueConstraint("email", name="uq_user_email")
     PrimaryKeyConstraint("id", name="pk_user_id")
 
