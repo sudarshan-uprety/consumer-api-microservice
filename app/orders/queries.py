@@ -1,6 +1,9 @@
+from sqlalchemy.orm import joinedload
+
 from app.orders.models import Orders, OrderItem
 from app.orders.schemas import OrderBase
 from app.payments.models import UserPayment
+from app.user.models import Users
 from utils import store
 
 
@@ -26,3 +29,10 @@ def create_order(orders: OrderBase, payment: UserPayment):
         store.session.add(order_item)
         store.session.commit()
     return order
+
+
+def get_user_orders(user: Users):
+    return Orders.query.options(
+        joinedload(Orders.payment),
+        joinedload(Orders.order_items)
+    ).filter_by(user_id=user.id, is_deleted=False).all()
