@@ -22,7 +22,8 @@ class Orders(Common, Base, SerializerMixin):
     payment_id = Column(Integer, ForeignKey('Payment.id'), nullable=False)
 
     user = relationship("Users", back_populates="orders")
-    payment = relationship("UserPayment", back_populates="orders")
+
+    # payment = relationship("UserPayment", back_populates="orders")
 
     class Config:
         orm_mode = True

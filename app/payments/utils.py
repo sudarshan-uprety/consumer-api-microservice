@@ -17,8 +17,8 @@ def validate_payment(data: TransactionDetails, user: Users):
     response_data = requests.get(request_url).json()
     if response_data['status'] == 'COMPLETE':
         # if transaction is valid create the order and payment object in database.
-        create_payment(payment=data, user=user)
-        create_order(orders=data.order_details.products, user=user)
+        payment_obj = create_payment(payment=response_data, user=user)
+        order_obj = create_order(orders=data, payment=payment_obj)
     else:
         raise GenericError(
             message="Invalid payment.",
