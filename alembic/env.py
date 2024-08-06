@@ -4,6 +4,7 @@ from alembic import context
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 
+from app.orders.models import Orders  # noqa: F401
 from app.payments.models import UserPayment  # noqa: F401
 from app.user.models import Users  # noqa: F401
 from utils.database import *  # noqa: F401
