@@ -26,8 +26,7 @@ jobs:
             elif [[ "${{ github.ref }}" == "refs/heads/uat" ]]; then
               echo "${{ vars.UAT_ENV }}" > .env
             elif [[ "${{ github.ref }}" == "refs/heads/dev" ]]; then
-              echo "Creating .env file for development"
-              echo "${{ vars.DEV_ENV }}" | tee .env >/dev/null
+              echo "${{ vars.DEV_ENV }}" > .env
             else
               echo "This branch does not have corresponding environment variables"
               exit 1
