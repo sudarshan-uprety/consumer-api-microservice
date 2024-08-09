@@ -1,5 +1,7 @@
 from fastapi import status, APIRouter, Depends
 
+from app.events.producer import inventory_produce
+from app.events.schema import ReduceQuantityEvent, ProductItem
 from app.payments.schema import TransactionDetails, PaymentResponseSchema
 from app.payments.utils import validate_payment
 from app.user.models import Users
@@ -25,6 +27,13 @@ async def create_user_payment(data: TransactionDetails, user: Users = Depends(OA
         email=orders.user.email,
         phone_number=orders.user.phone,
     )
+
+    event_data = ReduceQuantityEvent(
+        operation='decrease',
+        product=[ProductItem(product_id=product.product_id, quantity=product.quantity)
+                 for product in orders.order_items]
+    ).json()
+    inventory_produce(event_data=event_data)
     return response.success(
         message='Payment created successfully',
         data=response_data.dict(),
