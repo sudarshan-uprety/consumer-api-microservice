@@ -1,3 +1,5 @@
+from typing import List
+
 from pydantic import BaseModel
 
 
@@ -8,4 +10,4 @@ class ProductItem(BaseModel):
 
 class ReduceQuantityEvent(BaseModel):
     operation: str
-    product: list[ProductItem]
+    product: List[ProductItem]
