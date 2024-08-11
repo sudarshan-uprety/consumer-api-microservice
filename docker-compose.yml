@@ -34,6 +34,8 @@ services:
     environment:
       - env=dev
     container_name: auth_dev
+    networks:
+      - loki-network
 
   auth_db_uat:
     image: postgres:latest
@@ -62,6 +64,8 @@ services:
     environment:
       - env=uat
     container_name: auth_uat
+    networks:
+      - loki-network
 
   auth_db_prod:
     image: postgres:latest
@@ -90,9 +94,15 @@ services:
     environment:
       - env=prod
     container_name: auth_prod
+    networks:
+      - loki-network
 
 volumes:
   postgres_data_dev:
   postgres_data_uat:
   postgres_data_prod:
   redis-data:
+
+networks:
+  loki-network:
+    external: true
