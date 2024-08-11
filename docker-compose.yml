@@ -6,6 +6,9 @@ services:
     restart: unless-stopped
     volumes:
       - redis-data:/data
+    networks:
+      - loki-network
+
 
   auth_db_dev:
     image: postgres:latest
