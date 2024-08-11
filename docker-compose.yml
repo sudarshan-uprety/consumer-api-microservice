@@ -18,6 +18,9 @@ services:
       - .env
     volumes:
       - postgres_data_dev:/var/lib/postgresql/data
+    networks:
+      - loki-network
+
 
   auth_service_dev:
     build:
@@ -37,6 +40,7 @@ services:
     networks:
       - loki-network
 
+
   auth_db_uat:
     image: postgres:latest
     restart: always
@@ -48,6 +52,9 @@ services:
       - .env
     volumes:
       - postgres_data_uat:/var/lib/postgresql/data
+    networks:
+      - loki-network
+
 
   auth_service_uat:
     build:
@@ -67,6 +74,7 @@ services:
     networks:
       - loki-network
 
+
   auth_db_prod:
     image: postgres:latest
     restart: always
@@ -78,6 +86,9 @@ services:
       - .env
     volumes:
       - postgres_data_prod:/var/lib/postgresql/data
+    networks:
+      - loki-network
+
 
   auth_service_prod:
     build:
