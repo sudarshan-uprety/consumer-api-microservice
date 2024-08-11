@@ -6,6 +6,9 @@ services:
     restart: unless-stopped
     volumes:
       - redis-data:/data
+    networks:
+      - loki-network
+
 
   auth_db_dev:
     image: postgres:latest
@@ -18,6 +21,9 @@ services:
       - .env
     volumes:
       - postgres_data_dev:/var/lib/postgresql/data
+    networks:
+      - loki-network
+
 
   auth_service_dev:
     build:
@@ -34,6 +40,9 @@ services:
     environment:
       - env=dev
     container_name: auth_dev
+    networks:
+      - loki-network
+
 
   auth_db_uat:
     image: postgres:latest
@@ -46,6 +55,9 @@ services:
       - .env
     volumes:
       - postgres_data_uat:/var/lib/postgresql/data
+    networks:
+      - loki-network
+
 
   auth_service_uat:
     build:
@@ -62,6 +74,9 @@ services:
     environment:
       - env=uat
     container_name: auth_uat
+    networks:
+      - loki-network
+
 
   auth_db_prod:
     image: postgres:latest
@@ -74,6 +89,9 @@ services:
       - .env
     volumes:
       - postgres_data_prod:/var/lib/postgresql/data
+    networks:
+      - loki-network
+
 
   auth_service_prod:
     build:
@@ -90,9 +108,15 @@ services:
     environment:
       - env=prod
     container_name: auth_prod
+    networks:
+      - loki-network
 
 volumes:
   postgres_data_dev:
   postgres_data_uat:
   postgres_data_prod:
   redis-data:
+
+networks:
+  loki-network:
+    external: true

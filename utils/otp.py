@@ -12,7 +12,7 @@ class OTPService:
         self.expiry_seconds = expiry_seconds
 
     def generate_otp(self, user_email):
-        otp = str(random.randint(100000, 999999))
+        otp = str(random.randint(1000, 9999))
         key = f"otp:{user_email}"
         self.redis.setex(key, self.expiry_seconds, otp)
         return otp
