@@ -54,8 +54,6 @@ async def log_middleware(request: Request, call_next):
         request_body = await request.body()
         request_body = request_body.decode() if request_body else ""
 
-    logger.info(f"Received request: {request.method} {request.url.path} from {client_ip}")
-
     try:
         response = await call_next(request)
         process_time = time.time() - start_time
