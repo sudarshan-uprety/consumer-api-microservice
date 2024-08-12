@@ -3,7 +3,6 @@ import time
 import uuid
 
 from fastapi import Request
-from fastapi.responses import JSONResponse
 
 from utils.log import get_logger, trace_id_var
 
@@ -18,12 +17,6 @@ SENSITIVE_FIELDS = [
 
 
 def sanitize_payload(payload):
-    if isinstance(payload, bytes):
-        try:
-            payload = json.loads(payload.decode())
-        except json.JSONDecodeError:
-            return payload
-
     if isinstance(payload, str):
         try:
             payload = json.loads(payload)
@@ -31,12 +24,19 @@ def sanitize_payload(payload):
             return payload
 
     if isinstance(payload, dict):
-        return {k: '******' if k in SENSITIVE_FIELDS else
-        (sanitize_payload(v) if isinstance(v, (dict, list)) else v)
-                for k, v in payload.items()}
+        sanitized = {}
+        for key, value in payload.items():
+            if key in SENSITIVE_FIELDS:
+                sanitized[key] = "******"
+            elif isinstance(value, (dict, list)):
+                sanitized[key] = sanitize_payload(value)
+            else:
+                sanitized[key] = value
+        return sanitized
     elif isinstance(payload, list):
         return [sanitize_payload(item) for item in payload]
-    return payload
+    else:
+        return payload
 
 
 async def log_middleware(request: Request, call_next):
@@ -56,26 +56,11 @@ async def log_middleware(request: Request, call_next):
 
     logger.info(f"Received request: {request.method} {request.url.path} from {client_ip}")
 
-    async def capture_response(request):
-        response = await call_next(request)
-        response_body = b""
-        async for chunk in response.body_iterator:
-            response_body += chunk
-        return JSONResponse(
-            content=json.loads(response_body),
-            status_code=response.status_code,
-            headers=dict(response.headers)
-        )
-
     try:
-        response = await capture_response(request)
+        response = await call_next(request)
         process_time = time.time() - start_time
 
         status_code = response.status_code
-
-        # Redact sensitive data from response payload
-        response_content = json.loads(response.body)
-        response_payload = sanitize_payload(response_content)
 
         log_dict = {
             "url": request.url.path,
@@ -84,16 +69,15 @@ async def log_middleware(request: Request, call_next):
             "status_code": status_code,
             "trace_id": trace_id,
             "client_ip": client_ip,
-            "request_payload": request_body,
-            "response_payload": json.dumps(response_payload)  # Convert back to JSON string
+            "request_payload": request_body
         }
 
         if status_code >= 500:
-            logger.error(f"Request failed: {log_dict}")
+            logger.error(f"Request failed: {json.dumps(log_dict)}")
         elif status_code >= 400:
-            logger.warning(f"Request resulted in client error: {log_dict}")
+            logger.warning(f"Request resulted in client error: {json.dumps(log_dict)}")
         else:
-            logger.info(f"Request completed successfully: {log_dict}")
+            logger.info(f"Request completed successfully: {json.dumps(log_dict)}")
 
     except Exception as e:
         process_time = time.time() - start_time
