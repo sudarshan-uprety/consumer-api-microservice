@@ -5,7 +5,7 @@ from app.events.schema import ReduceQuantityEvent, ProductItem
 from app.payments.schema import TransactionDetails, PaymentResponseSchema
 from app.payments.utils import validate_payment
 from app.user.models import Users
-from utils import OAuth2, response
+from utils import OAuth2, response, log
 
 router = APIRouter(
     prefix="/payments",
@@ -29,6 +29,7 @@ async def create_user_payment(data: TransactionDetails, user: Users = Depends(OA
     )
 
     event_data = ReduceQuantityEvent(
+        trace_id=log.trace_id_var.get(),
         operation='decrease',
         product=[ProductItem(product_id=product.product_id, quantity=product.quantity)
                  for product in orders.order_items]
