@@ -1,11 +1,11 @@
-from fastapi import status, APIRouter, Depends
+from fastapi import status, APIRouter, Depends, BackgroundTasks
 
-from app.events.producer import inventory_produce
+from app.events.producer import produce
 from app.events.schema import ReduceQuantityEvent, ProductItem
 from app.payments.schema import TransactionDetails, PaymentResponseSchema
 from app.payments.utils import validate_payment
 from app.user.models import Users
-from utils import OAuth2, response, log
+from utils import OAuth2, response, log, variables
 
 router = APIRouter(
     prefix="/payments",
@@ -14,7 +14,11 @@ router = APIRouter(
 
 
 @router.post('/create', status_code=status.HTTP_200_OK)
-async def create_user_payment(data: TransactionDetails, user: Users = Depends(OAuth2.get_current_user)):
+async def create_user_payment(
+        data: TransactionDetails,
+        background_tasks: BackgroundTasks,
+        user: Users = Depends(OAuth2.get_current_user)
+):
     orders, payment = validate_payment(data=data, user=user)
     response_data = PaymentResponseSchema(
         id=orders.id,
@@ -34,7 +38,7 @@ async def create_user_payment(data: TransactionDetails, user: Users = Depends(OA
         product=[ProductItem(product_id=product.product_id, quantity=product.quantity)
                  for product in orders.order_items]
     ).json()
-    inventory_produce(event_data=event_data)
+    background_tasks.add_task(produce, event_data, variables.INVENTORY_QUEUE)
     return response.success(
         message='Payment created successfully',
         data=response_data.dict(),

@@ -1,38 +1,28 @@
-import pika
+import aio_pika
 
-from utils.variables import RABBITMQ_USERNAME, RABBITMQ_PASSWORD, RABBITMQ_HOST, INVENTORY_QUEUE
+from utils.variables import RABBITMQ_USERNAME, RABBITMQ_PASSWORD, RABBITMQ_HOST
 
 
-def inventory_produce(event_data):
-    credentials = pika.PlainCredentials(
-        username=RABBITMQ_USERNAME,
-        password=RABBITMQ_PASSWORD
-    )
-    connection = pika.BlockingConnection(
-        pika.ConnectionParameters(
-            host=RABBITMQ_HOST,
-            credentials=credentials)
-    )
-    channel = connection.channel()
-    channel.exchange_declare(
-        exchange=INVENTORY_QUEUE,
-        durable=True,
-        exchange_type='topic'
+async def produce(event_data, queue_name):
+    connection = await aio_pika.connect_robust(
+        f"amqp://{RABBITMQ_USERNAME}:{RABBITMQ_PASSWORD}@{RABBITMQ_HOST}/"
     )
 
-    # Declare and bind queue INVENTORY_QUEUE
-    channel.queue_declare(queue=INVENTORY_QUEUE, durable=True)
-    channel.queue_bind(
-        exchange=INVENTORY_QUEUE,
-        queue=INVENTORY_QUEUE,
-        routing_key=INVENTORY_QUEUE
-    )
-    # publish the data for subscriber
-    channel.basic_publish(
-        exchange=INVENTORY_QUEUE,
-        routing_key=INVENTORY_QUEUE,
-        body=event_data,
-        properties=pika.BasicProperties(
-            delivery_mode=2,
+    async with connection:
+        channel = await connection.channel()
+
+        exchange = await channel.declare_exchange(
+            queue_name,
+            aio_pika.ExchangeType.TOPIC,
+            durable=True
         )
-    )
+
+        queue = await channel.declare_queue(queue_name, durable=True)
+        await queue.bind(exchange, routing_key=queue_name)
+
+        message = aio_pika.Message(
+            body=event_data.encode(),
+            delivery_mode=aio_pika.DeliveryMode.PERSISTENT
+        )
+
+        await exchange.publish(message, routing_key=queue_name)
