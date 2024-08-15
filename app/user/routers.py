@@ -1,9 +1,11 @@
 from fastapi import status, APIRouter, BackgroundTasks, Depends
 
+from app.events.producer_functions import email_verification_procedure, forget_password_verification_procedure
+from app.events.schema import RegisterEmailEvent, ForgotPasswordEvent
 from app.user.queries import *
 from app.user.schema import *
 from app.user.utils import verify_signup_otp, verify_forget_password_otp
-from utils import response, jwt_token, OAuth2, email
+from utils import response, jwt_token, OAuth2, log, variables
 from utils.otp import otp
 
 router = APIRouter(
@@ -15,7 +17,18 @@ router = APIRouter(
 @router.post('/signup', status_code=status.HTTP_201_CREATED, response_model=UserRegisterResponse)
 async def signup(user: UserRegister, background_tasks: BackgroundTasks = BackgroundTasks()) -> UserRegisterResponse:
     user = create_user(user=user)
-    background_tasks.add_task(email.send_register_mail, user=user, otp=otp.generate_otp(user_email=user.email))
+    event_data = RegisterEmailEvent(
+        trace_id=log.trace_id_var.get(),
+        to=user.email,
+        event_name=variables.REGISTER_EMAIL,
+        otp=otp.generate_otp(user_email=user.email),
+        full_name=user.full_name
+    )
+    background_tasks.add_task(
+        email_verification_procedure,
+        data=event_data.json(),
+        queue=variables.EMAIL_QUEUE
+    )
     data = UserRegisterResponse.from_orm(user)
     return response.success(
         status_code=status.HTTP_201_CREATED,
@@ -81,8 +94,18 @@ async def get_me(user: Users = Depends(OAuth2.get_current_user)) -> UserDetails:
 @router.post('/forget/password')
 async def forget_password(user_email: EmailSchema, background_tasks: BackgroundTasks = BackgroundTasks()) -> dict:
     user = get_user_by_email_or_404(user_email.email)
-    code = otp.generate_otp(user_email=user.email)
-    background_tasks.add_task(email.send_forget_password_mail, user=user, code=code)
+    event_data = ForgotPasswordEvent(
+        trace_id=log.trace_id_var.get(),
+        to=user.email,
+        event_name=variables.FORGET_PASSWORD_EMAIL,
+        otp=otp.generate_otp(user_email=user.email),
+        full_name=user.full_name
+    )
+    background_tasks.add_task(
+        forget_password_verification_procedure,
+        data=event_data.json(),
+        queue=variables.EMAIL_QUEUE
+    )
     return response.success(
         status_code=status.HTTP_200_OK,
         message='Forget password email with OTP has been sent.',
