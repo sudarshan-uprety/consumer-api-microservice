@@ -76,12 +76,12 @@ def get_logger(name):
         backupCount=5
     )
     file_handler.setLevel(logging.DEBUG)
-    file_handler.setFormatter(CustomFormatter('%(asctime)s - %(name)s - %(levelname)s - %(trace_id)s - %(message)s'))
+    file_handler.setFormatter(CustomFormatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
 
     # Console handler
     console_handler = logging.StreamHandler()
     console_handler.setLevel(logging.DEBUG)
-    console_handler.setFormatter(CustomFormatter('%(asctime)s - %(name)s - %(levelname)s - %(trace_id)s - %(message)s'))
+    console_handler.setFormatter(CustomFormatter('%(asctime)s - %(name)s - %(levelname)s- %(message)s'))
 
     # Loki handler
     loki_handler = AsyncLokiHandler(
@@ -89,7 +89,7 @@ def get_logger(name):
         labels={"service": "login-auth", "env": ENV}
     )
     loki_handler.setLevel(logging.DEBUG)
-    loki_handler.setFormatter(CustomFormatter('%(asctime)s - %(name)s - %(levelname)s - %(trace_id)s - %(message)s'))
+    loki_handler.setFormatter(CustomFormatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
 
     # Add handlers to logger
     logger.addHandler(file_handler)
