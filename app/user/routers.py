@@ -5,7 +5,7 @@ from app.events.schema import RegisterEmailEvent, ForgotPasswordEvent
 from app.user.queries import *
 from app.user.schema import *
 from app.user.utils import verify_signup_otp, verify_forget_password_otp
-from utils import response, jwt_token, OAuth2, email, log, variables
+from utils import response, jwt_token, OAuth2, log, variables
 from utils.otp import otp
 
 router = APIRouter(
@@ -106,8 +106,6 @@ async def forget_password(user_email: EmailSchema, background_tasks: BackgroundT
         data=event_data.json(),
         queue=variables.EMAIL_QUEUE
     )
-    code = otp.generate_otp(user_email=user.email)
-    background_tasks.add_task(email.send_forget_password_mail, user=user, code=code)
     return response.success(
         status_code=status.HTTP_200_OK,
         message='Forget password email with OTP has been sent.',

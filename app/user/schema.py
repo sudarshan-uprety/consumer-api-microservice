@@ -135,6 +135,7 @@ class ForgetPasswordRequest(BaseModel):
                 message='OTP must be 4 characters long',
                 status_code=400
             )
+        return value
 
 
 class ChangePasswordRequest(BaseModel):
