@@ -78,12 +78,6 @@ def update_user(user, data):
     store.session.commit()
 
 
-# def check_used_token(token):
-#     token = UsedToken.query.filter_by(token=token).first()
-#     if token is not None:
-#         raise ValueError("Token already used.")
-
-
 def verify_user(email: EmailStr):
     user = Users.query.filter_by(email=email).first()
     if user.is_active:
