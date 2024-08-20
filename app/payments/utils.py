@@ -5,6 +5,7 @@ from app.payments.queries import create_payment
 from app.payments.schema import TransactionDetails
 from app.user.models import Users
 from utils.exceptions import GenericError
+from utils.variables import GET_PRODUCT_API
 
 
 def validate_payment(data: TransactionDetails, user: Users):
@@ -27,3 +28,9 @@ def validate_payment(data: TransactionDetails, user: Users):
             data=response_data['status'],
             errors={'error': 'Something went wrong.'}
         )
+
+
+def get_product_data(product_code) -> str:
+    url = GET_PRODUCT_API + product_code
+    response_data = requests.get(url).json()
+    return response_data['data']['name']
