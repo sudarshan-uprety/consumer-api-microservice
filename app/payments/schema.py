@@ -1,3 +1,6 @@
+from datetime import datetime
+from typing import List
+
 from pydantic import BaseModel, EmailStr, field_validator, ValidationInfo
 
 from app.orders.schemas import OrderBase
@@ -61,3 +64,28 @@ class PaymentResponseSchema(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+class OrderProductItem(BaseModel):
+    product_id: str
+    name: str
+    quantity: int
+    price: float
+    total: float
+
+
+class OrderConfirmationEmailEvent(BaseModel):
+    trace_id: str
+    event_name: str
+    to: EmailStr
+    order_id: str
+    full_name: str
+    customer_phone: str
+    delivery_address: str
+    products: List[OrderProductItem]
+    total_price: float
+    payment_id: str
+    payment_amount: float
+    payment_method: str
+    payment_status: str
+    order_date: datetime = datetime.now()

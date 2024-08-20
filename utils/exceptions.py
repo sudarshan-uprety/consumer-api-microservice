@@ -1,7 +1,8 @@
+from typing import Optional
+
 from utils.constant import (ERROR_BAD_REQUEST,
                             DATABASE_NOT_AVAILABLE_FOR_CONNECTION,
                             ERROR_INTERNAL_SERVER_ERROR, SERVICE_UNAVAILABLE)
-from typing import Dict, List, Optional, Union
 
 
 class ValidationError(Exception):
@@ -20,8 +21,6 @@ class DatabaseConnectionProblem(Exception):
         self.message = DATABASE_NOT_AVAILABLE_FOR_CONNECTION
         self.status_code = SERVICE_UNAVAILABLE
         super().__init__(self.status_code, self.message)
-
-        # raise DatabaseError(error=e.orig, code=e.code)
 
 
 class GenericError(Exception):
@@ -51,4 +50,3 @@ class GenericWebsocketError(Exception):
         self.message = message
         self.status_code = status_code
         super().__init__(status_code, message)
-
