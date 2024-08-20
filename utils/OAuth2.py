@@ -28,7 +28,6 @@ def get_current_user(token: str = Depends(reusable_oauth)) -> Users:
         )
 
     user = Users.query.filter_by(email=token_data.sub).first()
-    # user = get_user_by_email_or_404(email=token_data.sub)
     if user is None:
         raise exceptions.GenericError(
             message="User not found",
