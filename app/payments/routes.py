@@ -36,7 +36,7 @@ async def create_user_payment(
 
     event_data = ReduceQuantityEvent(
         trace_id=log.trace_id_var.get(),
-        operation='decrease',
+        event_name=variables.DECREASE_PRODUCT_QUANTITY_EVENT,
         product=[ProductItem(product_id=product.product_id, quantity=product.quantity)
                  for product in orders.order_items]
     ).json()
@@ -65,7 +65,6 @@ async def create_user_payment(
         payment_status=payment.payment_status,
         order_date=datetime.now()
     ).json()
-    print(order_confirmation_event)
 
     background_tasks.add_task(produce, event_data, variables.INVENTORY_QUEUE)
     background_tasks.add_task(produce, order_confirmation_event, variables.EMAIL_QUEUE)

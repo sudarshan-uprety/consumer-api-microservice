@@ -8,7 +8,7 @@ class ProductItem(BaseModel):
 
 class ReduceQuantityEvent(BaseModel):
     trace_id: str
-    operation: str
+    event_name: str
     product: list[ProductItem]
 
 
