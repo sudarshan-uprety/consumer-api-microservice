@@ -1,6 +1,9 @@
+import json
+
 from fastapi import FastAPI
 from fastapi.exceptions import (HTTPException, RequestValidationError)
 from fastapi.middleware.cors import CORSMiddleware
+from jose.exceptions import JWTError
 from sqlalchemy.exc import OperationalError, PendingRollbackError
 from starlette.middleware.base import BaseHTTPMiddleware
 
@@ -54,7 +57,7 @@ register_routes(server)
 register_middlewares(server)
 
 # add logging middleware
-server.add_middleware(BaseHTTPMiddleware, dispatch=middleware.log_middleware)
+server.add_middleware(BaseHTTPMiddleware, dispatch=middleware.optimized_logging_middleware)
 
 
 # add custom exception handler.
@@ -105,3 +108,15 @@ async def http_exception_handler(_, exception):
 async def exception_handler(_, exception):
     rollback_session()
     return response.error(constant.ERROR_INTERNAL_SERVER_ERROR, str(exception))
+
+
+@server.exception_handler(JWTError)
+async def jwt_exception_handler(_, exception):
+    rollback_session()
+    return response.error(constant.UNPROCESSABLE_ENTITY, str(exception))
+
+
+@server.exception_handler(json.JSONDecodeError)
+async def json_exception_handler(_, exception):
+    rollback_session()
+    return response.error(constant.UNPROCESSABLE_ENTITY, str(exception))
