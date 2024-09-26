@@ -18,7 +18,7 @@ def validate_payment(data: TransactionDetails, user: Users):
         f"total_amount={data.total_amount}&"
         f"transaction_uuid={data.transaction_uuid}"
     )
-    with httpx.Client() as client:
+    with httpx.Client(timeout=20) as client:
         response_data = client.get(request_url).json()
 
     if response_data['status'] == 'COMPLETE':
@@ -37,7 +37,7 @@ def validate_payment(data: TransactionDetails, user: Users):
 
 def get_product_data(product_code) -> str:
     url = GET_PRODUCT_API + product_code
-    with httpx.Client() as client:
+    with httpx.Client(timeout=20) as client:
         response_data = client.get(url).json()
     return response_data['data']['name']
 
@@ -50,7 +50,7 @@ def validate_order(data: List[ProductOrder]):
         quantity = order.quantity
 
         url = GET_PRODUCT_API + product_id
-        with httpx.Client() as client:
+        with httpx.Client(timeout=20) as client:
             response_data = client.get(url).json()['data']
 
         variant_found = False
