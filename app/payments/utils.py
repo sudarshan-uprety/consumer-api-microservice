@@ -15,10 +15,9 @@ def validate_payment(data: TransactionDetails, user: Users):
         f"total_amount={data.total_amount}&"
         f"transaction_uuid={data.transaction_uuid}"
     )
-    print(request_url)
-    # response_data = requests.get(request_url).json()
-    response_data = {"product_code": "EPAYTEST", "transaction_uuid": "123", "total_amount": 100, "status": "COMPLETE",
-                     "ref_id": "0001TS9"}
+    response_data = requests.get(request_url).json()
+    # response_data = {"product_code": "EPAYTEST", "transaction_uuid": "123", "total_amount": 100, "status": "COMPLETE",
+    #                  "ref_id": "0001TS9"}
     if response_data['status'] == 'COMPLETE':
         # if transaction is valid create the order and payment object in database.
         payment_obj = create_payment(payment=response_data, user=user)
