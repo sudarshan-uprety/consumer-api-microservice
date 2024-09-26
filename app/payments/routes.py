@@ -5,7 +5,7 @@ from fastapi import status, APIRouter, Depends, BackgroundTasks
 from app.events.producer import produce
 from app.events.schema import ReduceQuantityEvent, ProductItem
 from app.payments.schema import TransactionDetails, PaymentResponseSchema, OrderConfirmationEmailEvent, OrderProductItem
-from app.payments.utils import validate_payment, get_product_data
+from app.payments.utils import validate_payment, get_product_data, validate_order
 from app.user.models import Users
 from utils import OAuth2, response, log, variables
 
@@ -21,6 +21,7 @@ async def create_user_payment(
         background_tasks: BackgroundTasks,
         user: Users = Depends(OAuth2.get_current_user)
 ):
+    validate_order(data=data.order_details.products)
     orders, payment = validate_payment(data=data, user=user)
     response_data = PaymentResponseSchema(
         id=orders.id,
