@@ -65,7 +65,7 @@ def create_user(user):
     user_data['password'] = hashed_password
     user_data.pop('confirm_password', None)
     new_user = Users(**user_data)
-    new_user.is_active = True
+    new_user.is_active = False
     store.session.add(new_user)
     store.session.commit()
     return new_user
