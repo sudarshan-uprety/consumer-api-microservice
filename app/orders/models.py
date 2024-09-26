@@ -36,6 +36,8 @@ class OrderItem(Common, Base, SerializerMixin):
     product_id = Column(String, nullable=False)
     quantity = Column(Integer, nullable=False)
     price_per_item = Column(Float, nullable=False)
+    color = Column(String, nullable=True)
+    size = Column(String, nullable=True)
     total_amount = Column(Float, nullable=False)
     order = relationship("Orders", back_populates="order_items")
 

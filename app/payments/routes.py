@@ -37,7 +37,8 @@ async def create_user_payment(
     event_data = ReduceQuantityEvent(
         trace_id=log.trace_id_var.get(),
         event_name=variables.DECREASE_PRODUCT_QUANTITY_EVENT,
-        product=[ProductItem(product_id=product.product_id, quantity=product.quantity)
+        product=[ProductItem(product_id=product.product_id, quantity=product.quantity, size=product.size,
+                             color=product.color)
                  for product in orders.order_items]
     ).json()
 
@@ -55,7 +56,9 @@ async def create_user_payment(
                 name=get_product_data(item.product_id),
                 quantity=item.quantity,
                 price=item.price_per_item,
-                total=item.quantity * item.price_per_item
+                total=item.quantity * item.price_per_item,
+                size=item.size,
+                color=item.color
             ) for item in data.order_details.products
         ],
         total_price=data.total_amount,
