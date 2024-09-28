@@ -21,6 +21,10 @@ def validate_payment(data: TransactionDetails, user: Users):
     with httpx.Client(timeout=20) as client:
         response_data = client.get(request_url).json()
 
+        # response format example
+        # response_data = {"product_code": "EPAYTEST", "transaction_uuid": "123", "total_amount": 100.0,
+        #                  "status": "COMPLETE", "ref_id": "0001TS9"}
+
     if response_data['status'] == 'COMPLETE':
         # if transaction is valid create the order and payment object in database.
         payment_obj = create_payment(payment=response_data, user=user)
