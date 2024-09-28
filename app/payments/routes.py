@@ -5,7 +5,7 @@ from fastapi import status, APIRouter, Depends, BackgroundTasks
 from app.events.producer import produce
 from app.events.schema import ReduceQuantityEvent, ProductItem
 from app.payments.schema import TransactionDetails, PaymentResponseSchema, OrderConfirmationEmailEvent, OrderProductItem
-from app.payments.utils import validate_payment, get_product_data
+from app.payments.utils import validate_payment, get_product_data, validate_order
 from app.user.models import Users
 from utils import OAuth2, response, log, variables
 
@@ -21,6 +21,7 @@ async def create_user_payment(
         background_tasks: BackgroundTasks,
         user: Users = Depends(OAuth2.get_current_user)
 ):
+    validate_order(data=data.order_details.products)
     orders, payment = validate_payment(data=data, user=user)
     response_data = PaymentResponseSchema(
         id=orders.id,
@@ -37,7 +38,8 @@ async def create_user_payment(
     event_data = ReduceQuantityEvent(
         trace_id=log.trace_id_var.get(),
         event_name=variables.DECREASE_PRODUCT_QUANTITY_EVENT,
-        product=[ProductItem(product_id=product.product_id, quantity=product.quantity)
+        product=[ProductItem(product_id=product.product_id, quantity=product.quantity, size=product.size,
+                             color=product.color)
                  for product in orders.order_items]
     ).json()
 
@@ -55,7 +57,9 @@ async def create_user_payment(
                 name=get_product_data(item.product_id),
                 quantity=item.quantity,
                 price=item.price_per_item,
-                total=item.quantity * item.price_per_item
+                total=item.quantity * item.price_per_item,
+                size=item.size,
+                color=item.color
             ) for item in data.order_details.products
         ],
         total_price=data.total_amount,

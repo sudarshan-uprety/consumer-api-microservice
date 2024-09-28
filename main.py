@@ -116,6 +116,12 @@ async def jwt_exception_handler(_, exception):
     return response.error(constant.UNPROCESSABLE_ENTITY, str(exception))
 
 
+@server.exception_handler(exceptions.ValidationError)
+async def validation_exception_handler(_, exception):
+    rollback_session()
+    return response.error(constant.ERROR_BAD_REQUEST, str(exception.message))
+
+
 @server.exception_handler(json.JSONDecodeError)
 async def json_exception_handler(_, exception):
     rollback_session()

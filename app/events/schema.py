@@ -1,9 +1,13 @@
+from typing import Optional
+
 from pydantic import BaseModel, EmailStr
 
 
 class ProductItem(BaseModel):
     product_id: str
     quantity: int
+    size: Optional[str] = None
+    color: Optional[str] = None
 
 
 class ReduceQuantityEvent(BaseModel):

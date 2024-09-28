@@ -24,7 +24,9 @@ def create_order(orders: OrderBase, payment: UserPayment):
             product_id=product.product_id,
             quantity=product.quantity,
             price_per_item=product.price_per_item,
-            total_amount=product.price_per_item * product.quantity
+            total_amount=product.price_per_item * product.quantity,
+            size=product.size,
+            color=product.color
         )
         store.session.add(order_item)
         store.session.commit()
