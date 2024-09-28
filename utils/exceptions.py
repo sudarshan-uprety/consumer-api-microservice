@@ -6,7 +6,7 @@ from utils.constant import (ERROR_BAD_REQUEST,
 
 
 class ValidationError(Exception):
-    """Raised when pydantic error occurred."""
+    """Raised when validation error occurred."""
 
     def __init__(self, message=None, status_code=422, *args, **kwargs):
         self.message = message
