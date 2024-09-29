@@ -9,6 +9,7 @@ from starlette.middleware.base import BaseHTTPMiddleware
 
 from app.orders.routers import router as order_router
 from app.payments.routes import router as payment_router
+from app.search.routers import router as search_router
 from app.user.routers import router as user_router
 from utils import response, constant, exceptions, middleware, helpers
 from utils.database import connect_to_database, disconnect_from_database, rollback_session
@@ -18,6 +19,7 @@ def register_routes(server):
     server.include_router(user_router)
     server.include_router(payment_router)
     server.include_router(order_router)
+    server.include_router(search_router)
 
 
 def register_middlewares(server):
