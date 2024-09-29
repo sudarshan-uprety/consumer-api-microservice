@@ -1,17 +1,25 @@
 from typing import List, Optional
 
-from pydantic import BaseModel
-
-
-class SearchRequest(BaseModel):
-    query: str
-    index: str
+from pydantic import BaseModel, Field
 
 
 class ProductVariant(BaseModel):
     size: Optional[str]
     color: Optional[str]
     stock: int = 0
+
+
+class SearchRequest(BaseModel):
+    query: str
+    category: Optional[str] = None
+    min_price: Optional[float] = None
+    max_price: Optional[float] = None
+    size: Optional[str] = None
+    color: Optional[str] = None
+    vendor: Optional[str] = None
+    sort_by: str = Field("relevance", pattern="^(relevance|price_asc|price_desc)$")
+    page: int = Field(1, ge=1)
+    page_size: int = Field(20, ge=1, le=100)
 
 
 class SearchResponse(BaseModel):

@@ -56,3 +56,5 @@ ELASTICSEARCH_URL = os.getenv("ELASTICSEARCH_URL")
 
 # mongodb
 MONGODB_URL = os.getenv("MONGODB_URL")
+MONGODB_DB_NAME = os.getenv("MONGODB_DB_NAME")
+ELASTICSEARCH_INDEX = "unified_search"
