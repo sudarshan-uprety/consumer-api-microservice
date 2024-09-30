@@ -10,7 +10,7 @@ services:
       - discovery.type=single-node
       - bootstrap.memory_lock=true
       - "ES_JAVA_OPTS=-Xms3g -Xmx3g"
-      - xpack.security.enabled=false
+      - xpack.security.enabled=true
       - http.cors.enabled=true
       - http.cors.allow-origin=*
     ulimits:
