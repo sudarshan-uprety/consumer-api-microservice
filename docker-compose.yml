@@ -13,6 +13,8 @@ services:
       - xpack.security.enabled=true
       - http.cors.enabled=true
       - http.cors.allow-origin=*
+      - ELASTIC_PASSWORD= ${ELASTIC_PASSWORD}
+      - ELASTICSEARCH_API_KEY = ${ELASTICSEARCH_API_KEY}
     ulimits:
       memlock:
         soft: -1
