@@ -40,5 +40,4 @@ class SearchResponse(BaseModel):
     type: Optional[str]
     vendor: Optional[str]
     variants: Optional[List[ProductVariant]]
-    total_stock: Optional[int]
     highlights: Dict[str, List[str]]

@@ -16,6 +16,7 @@ async def index_data(es_client: Elasticsearch = Depends(create_es_client)):
     create_index_if_not_exists(es_client)
     mongo_db = await get_mongo_client()
     products = await get_all_documents(mongo_db.products)
+    print(products)
     product_docs = [
         {
             "id": str(prod["_id"]),
@@ -99,9 +100,7 @@ async def search(
                 "description": {}
             }
         }
-
         result = es_client.search(index=ELASTICSEARCH_INDEX, body=body)
-
         # Process results (similar to your original code)
         search_results = [
             SearchResponse(
@@ -124,7 +123,6 @@ async def search(
             )
             for hit in result["hits"]["hits"]
         ]
-
         return search_results
 
     except NotFoundError:

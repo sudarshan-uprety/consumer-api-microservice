@@ -5,13 +5,13 @@ from elasticsearch import Elasticsearch
 from elasticsearch.helpers import bulk
 from motor.motor_asyncio import AsyncIOMotorClient
 
-from utils import constant
 from utils.exceptions import GenericError
 from utils.variables import ELASTICSEARCH_URL, MONGODB_DB_NAME, MONGODB_URL, ENV
 
 
 def create_es_client():
-    return Elasticsearch([ELASTICSEARCH_URL])
+    data = Elasticsearch([ELASTICSEARCH_URL])
+    return data
 
 
 def get_index_name() -> str:
@@ -64,7 +64,8 @@ def create_index_if_not_exists(es_client: Elasticsearch) -> None:
         }
         es_client.indices.create(index=index_name, body=mapping)
     else:
-        raise GenericError(message=f"Index {index_name} already exists", status_code=constant.RESOURCE_EXISTS)
+        pass
+        # raise GenericError(message=f"Index {index_name} already exists", status_code=constant.RESOURCE_EXISTS)
 
 
 def index_documents(es_client: Elasticsearch, documents: List[Dict[str, Any]]) -> None:
@@ -72,19 +73,19 @@ def index_documents(es_client: Elasticsearch, documents: List[Dict[str, Any]]) -
     actions = [
         {
             "_index": index_name,
-            "_id": doc["id"],
-            "_source": {
+            "_id": str(doc["id"]),
+            "_source": serialize_document({
                 "name": doc.get("name", ""),
                 "description": doc.get("description", ""),
                 "price": doc.get("price", 0),
                 "image": doc.get("image", []),
-                "category": doc.get("category", ""),
+                "category": doc.get("category", ""),  # Ensure ObjectId fields are converted
                 "status": doc.get("status", True),
                 "type": doc.get("type", ""),
                 "vendor": doc.get("vendor", ""),
                 "total_stock": doc.get("total_stock", 0),
                 "variants": doc.get("variants", [])
-            }
+            })
         }
         for doc in documents
     ]
