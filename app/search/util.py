@@ -6,11 +6,11 @@ from elasticsearch.helpers import bulk
 from motor.motor_asyncio import AsyncIOMotorClient
 
 from utils.exceptions import GenericError
-from utils.variables import ELASTICSEARCH_URL, MONGODB_DB_NAME, MONGODB_URL, ENV
+from utils.variables import ELASTICSEARCH_URL, MONGODB_DB_NAME, MONGODB_URL, ENV, ELASTIC_USERNAME, ELASTIC_PASSWORD
 
 
 def create_es_client():
-    data = Elasticsearch([ELASTICSEARCH_URL])
+    data = Elasticsearch([ELASTICSEARCH_URL], http_auth=(ELASTIC_USERNAME, ELASTIC_PASSWORD), timeout=60)
     return data
 
 

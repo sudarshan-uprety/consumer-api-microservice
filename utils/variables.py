@@ -53,6 +53,8 @@ GET_PRODUCT_API = os.getenv("GET_PRODUCT_API")
 
 # elastic search
 ELASTICSEARCH_URL = os.getenv("ELASTICSEARCH_URL")
+ELASTIC_USERNAME = os.getenv("ELASTIC_USERNAME")
+ELASTIC_PASSWORD = os.getenv("ELASTIC_PASSWORD")
 
 # mongodb
 MONGODB_URL = os.getenv("MONGODB_URL")
