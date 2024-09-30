@@ -146,6 +146,7 @@ volumes:
   postgres_data_uat:
   postgres_data_prod:
   redis-data:
+  elasticsearch-data:
 
 networks:
   loki-network:

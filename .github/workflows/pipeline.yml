@@ -52,7 +52,7 @@ jobs:
             cd ${{ vars.PATH }}${{ github.ref_name }}
             
             if [[ "${{ github.ref }}" == "refs/heads/dev" ]]; then
-              sudo docker-compose up -d auth_db_dev auth_service_dev --build
+              sudo docker-compose up -d elasticsearch auth_db_dev auth_service_dev --build
             elif [[ "${{ github.ref }}" == "refs/heads/uat" ]]; then
               sudo docker-compose up -d auth_db_uat auth_service_uat --build
             elif [[ "${{ github.ref }}" == "refs/heads/prod" ]]; then
