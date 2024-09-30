@@ -1,73 +1,99 @@
+from typing import List, Dict, Any
+
 from bson import ObjectId
 from elasticsearch import Elasticsearch
 from elasticsearch.helpers import bulk
 from motor.motor_asyncio import AsyncIOMotorClient
 
-from utils.variables import ELASTICSEARCH_URL, ELASTICSEARCH_INDEX, MONGODB_DB_NAME, MONGODB_URL
+from utils import constant
+from utils.exceptions import GenericError
+from utils.variables import ELASTICSEARCH_URL, MONGODB_DB_NAME, MONGODB_URL, ENV
 
 
 def create_es_client():
     return Elasticsearch([ELASTICSEARCH_URL])
 
 
-def create_index_if_not_exists(es_client: Elasticsearch):
-    try:
-        if not es_client.indices.exists(index=ELASTICSEARCH_INDEX):
-            mapping = {
-                "settings": {
-                    "analysis": {
-                        "analyzer": {
-                            "custom_analyzer": {
-                                "type": "custom",
-                                "tokenizer": "standard",
-                                "filter": ["lowercase", "snowball"]
-                            }
+def get_index_name() -> str:
+    return f"{ENV.lower()}"
+
+
+def create_index_if_not_exists(es_client: Elasticsearch) -> None:
+    index_name = get_index_name()
+    if not es_client.indices.exists(index=index_name):
+        mapping = {
+            "settings": {
+                "analysis": {
+                    "analyzer": {
+                        "custom_analyzer": {
+                            "type": "custom",
+                            "tokenizer": "standard",
+                            "filter": ["lowercase", "snowball", "edge_ngram"]
+                        }
+                    },
+                    "filter": {
+                        "edge_ngram": {
+                            "type": "edge_ngram",
+                            "min_gram": 1,
+                            "max_gram": 20
                         }
                     }
-                },
-                "mappings": {
-                    "properties": {
-                        "name": {"type": "text", "analyzer": "custom_analyzer"},
-                        "description": {"type": "text", "analyzer": "custom_analyzer"},
-                        "status": {"type": "boolean"},
-                        "price": {"type": "float"},
-                        "image": {"type": "keyword", "index": False},
-                        "category": {"type": "keyword"},
-                        "type": {"type": "keyword"},
-                        "vendor": {"type": "keyword"},
-                        "total_stock": {"type": "integer"},
-                        "variants": {
-                            "type": "nested",
-                            "properties": {
-                                "size": {"type": "keyword"},
-                                "color": {"type": "keyword"},
-                                "stock": {"type": "integer"}
-                            }
+                }
+            },
+            "mappings": {
+                "properties": {
+                    "name": {"type": "text", "analyzer": "custom_analyzer", "search_analyzer": "standard"},
+                    "description": {"type": "text", "analyzer": "custom_analyzer", "search_analyzer": "standard"},
+                    "price": {"type": "float"},
+                    "image": {"type": "keyword"},
+                    "category": {"type": "keyword"},
+                    "status": {"type": "boolean"},
+                    "type": {"type": "keyword"},
+                    "vendor": {"type": "keyword"},
+                    "total_stock": {"type": "integer"},
+                    "variants": {
+                        "type": "nested",
+                        "properties": {
+                            "size": {"type": "keyword"},
+                            "color": {"type": "keyword"},
+                            "stock": {"type": "integer"}
                         }
                     }
                 }
             }
-            es_client.indices.create(index=ELASTICSEARCH_INDEX, body=mapping)
-            print(f"Index '{ELASTICSEARCH_INDEX}' created.")
-        else:
-            print(f"Index '{ELASTICSEARCH_INDEX}' already exists.")
-    except Exception as e:
-        print(f"Error creating index '{ELASTICSEARCH_INDEX}': {str(e)}")
-        raise
+        }
+        es_client.indices.create(index=index_name, body=mapping)
+    else:
+        raise GenericError(message=f"Index {index_name} already exists", status_code=constant.RESOURCE_EXISTS)
 
 
-def index_documents(es_client: Elasticsearch, documents):
-    serialized_docs = [serialize_document(doc) for doc in documents]
+def index_documents(es_client: Elasticsearch, documents: List[Dict[str, Any]]) -> None:
+    index_name = get_index_name()
     actions = [
         {
-            "_index": ELASTICSEARCH_INDEX,
+            "_index": index_name,
             "_id": doc["id"],
-            "_source": doc
+            "_source": {
+                "name": doc.get("name", ""),
+                "description": doc.get("description", ""),
+                "price": doc.get("price", 0),
+                "image": doc.get("image", []),
+                "category": doc.get("category", ""),
+                "status": doc.get("status", True),
+                "type": doc.get("type", ""),
+                "vendor": doc.get("vendor", ""),
+                "total_stock": doc.get("total_stock", 0),
+                "variants": doc.get("variants", [])
+            }
         }
-        for doc in serialized_docs
+        for doc in documents
     ]
-    success, failed = bulk(es_client, actions)
-    print(f"Indexed {success} documents. Failed: {len(failed)}")
+
+    success, failed = bulk(es_client, actions, raise_on_error=False)
+
+    if failed:
+        error_messages = [f"{item['index']['_id']}: {item['index']['error']['reason']}" for item in failed]
+        raise GenericError(message=f"Failed to index some documents: {', '.join(error_messages)}")
 
 
 async def get_mongo_client():
