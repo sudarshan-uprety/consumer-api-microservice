@@ -8,7 +8,10 @@ from app.search.util import create_es_client, create_index_if_not_exists, index_
     get_all_documents
 from utils.variables import ELASTICSEARCH_INDEX
 
-router = APIRouter()
+router = APIRouter(
+    prefix="/search",
+    tags=["search endpoints"],
+)
 
 
 @router.post("/index_data")
@@ -16,28 +19,25 @@ async def index_data(es_client: Elasticsearch = Depends(create_es_client)):
     create_index_if_not_exists(es_client)
     mongo_db = await get_mongo_client()
     products = await get_all_documents(mongo_db.products)
-    print(products)
+
     product_docs = [
         {
             "id": str(prod["_id"]),
             "name": prod["name"],
             "description": prod["description"],
             "price": prod.get("price", 0),
-            "image": prod.get("image", []),
             "category": prod.get("category", ""),
-            "status": prod.get("status", True),
             "type": prod.get("type", ""),
             "vendor": prod.get("vendor", ""),
-            "total_stock": prod.get("total_stock", 0),
-            "variants": prod.get("variants", [])
+            "variants": prod.get("variants", []),
         }
-        for prod in products if prod.get("status", True)  # Only index products with status=True
+        for prod in products
     ]
     index_documents(es_client, product_docs)
     return {"message": "Data indexed successfully"}
 
 
-@router.post("/search", response_model=List[SearchResponse])
+@router.post("", response_model=List[SearchResponse])
 async def search(
         search_request: SearchRequest,
         es_client: Elasticsearch = Depends(create_es_client)

@@ -78,12 +78,9 @@ def index_documents(es_client: Elasticsearch, documents: List[Dict[str, Any]]) -
                 "name": doc.get("name", ""),
                 "description": doc.get("description", ""),
                 "price": doc.get("price", 0),
-                "image": doc.get("image", []),
                 "category": doc.get("category", ""),  # Ensure ObjectId fields are converted
-                "status": doc.get("status", True),
                 "type": doc.get("type", ""),
                 "vendor": doc.get("vendor", ""),
-                "total_stock": doc.get("total_stock", 0),
                 "variants": doc.get("variants", [])
             })
         }
@@ -103,7 +100,60 @@ async def get_mongo_client():
 
 
 async def get_all_documents(collection):
-    cursor = collection.find({})
+    pipeline = [
+        {
+            "$match": {
+                "status": True,
+                "is_deleted": False
+            }
+        },
+        {
+            "$lookup": {
+                "from": "category",
+                "localField": "category",
+                "foreignField": "_id",
+                "as": "category"
+            }
+        },
+        {
+            "$lookup": {
+                "from": "type",
+                "localField": "type",
+                "foreignField": "_id",
+                "as": "type"
+            }
+        },
+        {
+            "$lookup": {
+                "from": "vendors",
+                "localField": "vendor",
+                "foreignField": "_id",
+                "as": "vendor"
+            }
+        },
+        {
+            "$addFields": {
+                "category": {"$arrayElemAt": ["$category", 0]},
+                "type": {"$arrayElemAt": ["$type", 0]},
+                "vendor": {"$arrayElemAt": ["$vendor", 0]}
+            }
+        },
+        {
+            "$project": {
+                "_id": 1,
+                "name": 1,
+                "price": 1,
+                "description": 1,
+                "variants": 1,
+                "image": 1,
+                "category": {"$ifNull": ["$category.name", None]},
+                "type": {"$ifNull": ["$type.name", None]},
+                "vendor": {"$ifNull": ["$vendor.store_name", None]}
+            }
+        }
+    ]
+
+    cursor = collection.aggregate(pipeline)
     documents = await cursor.to_list(length=None)
     return documents
 
