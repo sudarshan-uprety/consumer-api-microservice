@@ -14,7 +14,7 @@ ERROR_INTERNAL_SERVER_ERROR = 500
 ERROR_FOUND = 302
 SERVICE_UNAVAILABLE = 503
 UNPROCESSABLE_ENTITY = 422
-
+RESOURCE_EXISTS = 409
 # Success constants
 
 
@@ -25,4 +25,3 @@ DATABASE_CONNECTION_ERRORS = [
     "is the server running", "failure in name resolution", "connection refused"
 ]
 DATABASE_NOT_AVAILABLE_FOR_CONNECTION = "Sorry, but the database is either offline or not accepting connections."
-
