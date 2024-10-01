@@ -1,5 +1,6 @@
 import json
 
+from elasticsearch.exceptions import NotFoundError, AuthorizationException, AuthenticationException
 from fastapi import FastAPI
 from fastapi.exceptions import (HTTPException, RequestValidationError)
 from fastapi.middleware.cors import CORSMiddleware
@@ -9,6 +10,7 @@ from starlette.middleware.base import BaseHTTPMiddleware
 
 from app.orders.routers import router as order_router
 from app.payments.routes import router as payment_router
+from app.search.routers import router as search_router
 from app.user.routers import router as user_router
 from utils import response, constant, exceptions, middleware, helpers
 from utils.database import connect_to_database, disconnect_from_database, rollback_session
@@ -18,6 +20,7 @@ def register_routes(server):
     server.include_router(user_router)
     server.include_router(payment_router)
     server.include_router(order_router)
+    server.include_router(search_router)
 
 
 def register_middlewares(server):
@@ -126,3 +129,21 @@ async def validation_exception_handler(_, exception):
 async def json_exception_handler(_, exception):
     rollback_session()
     return response.error(constant.UNPROCESSABLE_ENTITY, str(exception))
+
+
+@server.exception_handler(NotFoundError)
+async def es_not_found_exception_handler(_, exception):
+    rollback_session()
+    return response.error(constant.ERROR_NOT_FOUND, "Elasticsearch document not found")
+
+
+@server.exception_handler(AuthenticationException)
+async def es_authentication_exception_handler(_, exception):
+    rollback_session()
+    return response.error(constant.ERROR_UNAUTHORIZED, "Elasticsearch authentication failed")
+
+
+@server.exception_handler(AuthorizationException)
+async def es_authorization_exception_handler(_, exception):
+    rollback_session()
+    return response.error(constant.ERROR_FORBIDDEN, "Elasticsearch authorization failed")

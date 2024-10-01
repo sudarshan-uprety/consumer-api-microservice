@@ -1,6 +1,32 @@
 version: '3'
 
 services:
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.14.0
+    restart: unless-stopped
+    environment:
+      - node.name=elasticsearch
+      - cluster.name=es-docker-cluster
+      - discovery.type=single-node
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms3g -Xmx3g"
+      - xpack.security.enabled=true
+      - http.cors.enabled=true
+      - http.cors.allow-origin=*
+      - ELASTIC_PASSWORD= ${ELASTIC_PASSWORD}
+      - ELASTICSEARCH_API_KEY = ${ELASTICSEARCH_API_KEY}
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - elasticsearch-data:/usr/share/elasticsearch/data
+    ports:
+      - "9200:9200"
+    networks:
+      - loki-network
+
+
   redis-server:
     image: redis:latest
     restart: unless-stopped
@@ -122,6 +148,7 @@ volumes:
   postgres_data_uat:
   postgres_data_prod:
   redis-data:
+  elasticsearch-data:
 
 networks:
   loki-network:
