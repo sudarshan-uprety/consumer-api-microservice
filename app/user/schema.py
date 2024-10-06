@@ -94,6 +94,7 @@ class UserDetails(BaseModel):
     full_name: str
     email: EmailStr
     created_at: datetime
+    address: str
     phone: str
 
     class Config:
