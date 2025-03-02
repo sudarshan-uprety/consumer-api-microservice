@@ -24,7 +24,7 @@ services:
     ports:
       - "9200:9200"
     networks:
-      - loki-network
+      - ms
 
 
   redis-server:
@@ -33,7 +33,7 @@ services:
     volumes:
       - redis-data:/data
     networks:
-      - loki-network
+      - ms
 
 
   auth_db_dev:
@@ -50,7 +50,7 @@ services:
     ports:
       - "5433:5432"
     networks:
-      - loki-network
+      - ms
 
 
   auth_service_dev:
@@ -69,7 +69,7 @@ services:
       - env=dev
     container_name: auth_dev
     networks:
-      - loki-network
+      - ms
 
 
   auth_db_uat:
@@ -86,7 +86,7 @@ services:
     ports:
       - "5434:5432"
     networks:
-      - loki-network
+      - ms
 
 
   auth_service_uat:
@@ -105,7 +105,7 @@ services:
       - env=uat
     container_name: auth_uat
     networks:
-      - loki-network
+      - ms
 
 
   auth_db_prod:
@@ -122,7 +122,7 @@ services:
     ports:
       - "5435:5432"
     networks:
-      - loki-network
+      - ms
 
 
   auth_service_prod:
@@ -141,7 +141,7 @@ services:
       - env=prod
     container_name: auth_prod
     networks:
-      - loki-network
+      - ms
 
 volumes:
   postgres_data_dev:
@@ -151,5 +151,5 @@ volumes:
   elasticsearch-data:
 
 networks:
-  loki-network:
+  ms:
     external: true
