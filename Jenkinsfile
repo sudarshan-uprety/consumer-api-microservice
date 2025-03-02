@@ -60,7 +60,7 @@ pipeline {
                         string(credentialsId: 'SERVER_PORT', variable: 'SSH_PORT')
                     ]) {
                         sh """
-                            scp -i \$SSH_KEY_PATH -P \$SSH_PORT -r ./ \${SERVER_USER}@\${SERVER_HOST}:${env.ECOM_PATH}/${env.BRANCH_NAME}
+                                scp -i \$SSH_KEY_PATH -P \$SSH_PORT -r -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ./ \${SERVER_USER}@\${SERVER_HOST}:${env.ECOM_PATH}/${env.BRANCH_NAME}
                         """
                     }
                 }
