@@ -88,7 +88,7 @@ pipeline {
                         string(credentialsId: 'SERVER_PORT', variable: 'SSH_PORT')
                     ]) {
                         sh """
-                            ssh -i \$SSH_KEY_PATH -p \$SSH_PORT \${SERVER_USER}@\${SERVER_HOST} "cd ${env.ECOM_PATH}/${env.BRANCH_NAME} && ${composeUpCommand} && sudo docker image prune -a --force"
+                                ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i \$SSH_KEY_PATH -p \$SSH_PORT \${SERVER_USER}@\${SERVER_HOST} "cd ${env.ECOM_PATH}/${env.BRANCH_NAME} && ${composeUpCommand} && sudo docker image prune -a --force"
                         """
                     }
                 }
