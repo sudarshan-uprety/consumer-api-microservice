@@ -51,7 +51,11 @@ services:
       - "5433:5432"
     networks:
       - ms
-
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${USER_POSTGRES_DB_USER} -d ${USER_POSTGRES_DB_NAME}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   auth_service_dev:
     build:
@@ -87,7 +91,11 @@ services:
       - "5434:5432"
     networks:
       - ms
-
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${USER_POSTGRES_DB_USER} -d ${USER_POSTGRES_DB_NAME}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   auth_service_uat:
     build:
@@ -123,7 +131,11 @@ services:
       - "5435:5432"
     networks:
       - ms
-
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${USER_POSTGRES_DB_USER} -d ${USER_POSTGRES_DB_NAME}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   auth_service_prod:
     build:
