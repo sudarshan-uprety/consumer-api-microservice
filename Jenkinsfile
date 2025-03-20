@@ -98,7 +98,16 @@ pipeline {
 
     post {
         always {
+            script {
+                commiterEmail = sh(script: "git show -s --format='%ae'", returnStdout: true).trim()
+            }
             cleanWs()
+        }
+        failure {
+            emailext body: '${DEFAULT_CONTENT}',
+                to: commiterEmail, 
+                subject: '${DEFAULT_SUBJECT}', 
+                saveOutput: false
         }
     }
 }
