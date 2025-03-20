@@ -1,14 +1,6 @@
 pipeline {
     agent any
 
-    environment {
-        PROD_ENV = 'ECOM_PROD_ENV'
-        UAT_ENV = 'ECOM_UAT_ENV'
-        DEV_ENV = 'ECOM_DEV_ENV'
-        GRPC_ENV = 'ECOM_GRPC_ENV'
-        ECOM_PATH = '/home/ubuntu/sudarshan/microservices/authentication'
-    }
-
     stages {
         stage('Checkout Code') {
             steps {
