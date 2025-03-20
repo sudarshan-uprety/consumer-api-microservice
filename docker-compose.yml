@@ -14,7 +14,7 @@ services:
       - http.cors.enabled=true
       - http.cors.allow-origin=*
       - ELASTIC_PASSWORD= ${ELASTIC_PASSWORD}
-      - ELASTICSEARCH_API_KEY = ${ELASTICSEARCH_API_KEY}
+      - ELASTICSEARCH_API_KEY= ${ELASTICSEARCH_API_KEY}
     ulimits:
       memlock:
         soft: -1
@@ -24,7 +24,7 @@ services:
     ports:
       - "9200:9200"
     networks:
-      - loki-network
+      - ms
 
 
   redis-server:
@@ -33,7 +33,7 @@ services:
     volumes:
       - redis-data:/data
     networks:
-      - loki-network
+      - ms
 
 
   auth_db_dev:
@@ -50,8 +50,12 @@ services:
     ports:
       - "5433:5432"
     networks:
-      - loki-network
-
+      - ms
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${USER_POSTGRES_DB_USER} -d ${USER_POSTGRES_DB_NAME}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   auth_service_dev:
     build:
@@ -69,7 +73,7 @@ services:
       - env=dev
     container_name: auth_dev
     networks:
-      - loki-network
+      - ms
 
 
   auth_db_uat:
@@ -86,8 +90,12 @@ services:
     ports:
       - "5434:5432"
     networks:
-      - loki-network
-
+      - ms
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${USER_POSTGRES_DB_USER} -d ${USER_POSTGRES_DB_NAME}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   auth_service_uat:
     build:
@@ -105,7 +113,7 @@ services:
       - env=uat
     container_name: auth_uat
     networks:
-      - loki-network
+      - ms
 
 
   auth_db_prod:
@@ -122,8 +130,12 @@ services:
     ports:
       - "5435:5432"
     networks:
-      - loki-network
-
+      - ms
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${USER_POSTGRES_DB_USER} -d ${USER_POSTGRES_DB_NAME}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   auth_service_prod:
     build:
@@ -141,7 +153,7 @@ services:
       - env=prod
     container_name: auth_prod
     networks:
-      - loki-network
+      - ms
 
 volumes:
   postgres_data_dev:
@@ -151,5 +163,5 @@ volumes:
   elasticsearch-data:
 
 networks:
-  loki-network:
+  ms:
     external: true
