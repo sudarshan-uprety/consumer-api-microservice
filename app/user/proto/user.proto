@@ -1,0 +1,100 @@
+syntax = "proto3";
+
+package auth;
+
+service AuthService {
+  rpc Signup (UserRegisterRequest) returns (UserRegisterResponse);
+  rpc VerifyOTP (OTPVerificationRequest) returns (BasicResponse);
+  rpc Login (UserLoginRequest) returns (LoginResponse);
+  rpc RefreshToken (RefreshTokenRequest) returns (TokenResponse);
+  rpc GetMe (UserRequest) returns (UserDetails);
+  rpc ForgetPassword (EmailRequest) returns (BasicResponse);
+  rpc ValidateForgetPassword (ForgetPasswordRequest) returns (BasicResponse);
+  rpc ChangePassword (ChangePasswordRequest) returns (BasicResponse);
+  rpc UpdateUser (UpdateUserDetailsRequest) returns (BasicResponse);
+}
+
+// User registration
+message UserRegisterRequest {
+  string full_name = 1;
+  string phone = 2;
+  string address = 3;
+  string password = 4;
+  string confirm_password = 5;
+}
+
+message UserRegisterResponse {
+    string email = 1;
+    string full_name = 2;
+    string phone = 3;
+    string address = 4;
+}
+
+// OTP Verification
+message OTPVerificationRequest {
+  string email = 1;
+  string otp = 2;
+}
+
+// Login request
+message UserLoginRequest {
+  string email = 1;
+  string password = 2;
+}
+
+message LoginResponse {
+  string access_token = 1;
+  string refresh_token = 2;
+  UserRegisterResponse user = 3;
+}
+
+// Token
+message RefreshTokenRequest {
+  string refresh_token = 1;
+}
+
+message TokenResponse {
+  string access_token = 1;
+}
+
+// User profile
+message UserRequest {}
+
+message UserDetails {
+  int32 id = 1;
+  string email = 2;
+  string full_name = 3;
+  string created_at = 4;
+  string address = 5;
+  string phone = 6;
+}
+
+// Password operations
+message EmailRequest {
+  string email = 1;
+}
+
+message ForgetPasswordRequest {
+  string email = 1;
+  string otp = 2;
+  string password = 3;
+  string confirm_password = 4;
+}
+
+message ChangePasswordRequest {
+  string current_password = 1;
+  string new_password = 2;
+  string confirm_password = 3;
+}
+
+// Update user
+message UpdateUserDetailsRequest {
+  optional string full_name = 1;
+  optional string email = 2;
+  optional string address = 3;
+}
+
+// Common Response
+message BasicResponse {
+  string message = 1;
+}
