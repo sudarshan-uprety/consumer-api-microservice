@@ -26,5 +26,6 @@ aio-pika==9.4.3
 motor==3.6.0
 elastic-transport==8.15.0
 elasticsearch==8.15.1
-
-
+grpcio==1.71.0
+grpcio-reflection==1.71.0
+grpcio-tools==1.71.0

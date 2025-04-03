@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package user;
+
+service EmailService {
+  rpc SendEmail (EmailRequest) returns (EmailResponse);
+}
+
+message EmailRequest {
+  string trace_id = 1;
+  string to = 2;
+  string event_name = 3;
+  string otp = 4;
+  string full_name = 5;
+}
+
+message EmailResponse {
+  bool success = 1;
+  string message = 2;
+}

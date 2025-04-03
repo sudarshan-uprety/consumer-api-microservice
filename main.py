@@ -1,4 +1,5 @@
 import json
+import asyncio
 
 from elasticsearch.exceptions import NotFoundError, AuthorizationException, AuthenticationException
 from fastapi import FastAPI
@@ -7,6 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from jose.exceptions import JWTError
 from sqlalchemy.exc import OperationalError, PendingRollbackError
 from starlette.middleware.base import BaseHTTPMiddleware
+import grpc
 
 from app.orders.routers import router as order_router
 from app.payments.routes import router as payment_router
@@ -14,6 +16,8 @@ from app.search.routers import router as search_router
 from app.user.routers import router as user_router
 from utils import response, constant, exceptions, middleware, helpers
 from utils.database import connect_to_database, disconnect_from_database, rollback_session
+from app.events.proto import email_pb2_grpc
+from app.events import email_grpc
 
 
 def register_routes(server):
@@ -40,11 +44,20 @@ server = FastAPI(
     docs_url="/api/docs/",
 )
 
+async def serve_grpc():
+    grpc_server  = grpc.aio.server()
+    email_pb2_grpc.add_EmailServiceServicer_to_server(email_grpc.EmailService(), grpc_server)
+    listen_address = "[::]:50051"
+    grpc_server.add_insecure_port(listen_address)
+    await grpc_server.start()
+    await grpc_server.wait_for_termination()
+
 
 # Startup Events
 @server.on_event("startup")
 async def startup_event():
     connect_to_database()
+    asyncio.create_task(serve_grpc())
 
 
 # Shutdown Events
