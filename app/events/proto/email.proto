@@ -3,10 +3,37 @@ syntax = "proto3";
 package user;
 
 service EmailService {
-  rpc SendEmail (EmailRequest) returns (EmailResponse);
+  rpc RegisterSendEmail (RegisterAndForgetPasswordEmailRequest) returns (EmailResponse);
+  rpc ForgetPasswordSendEmail (RegisterAndForgetPasswordEmailRequest) returns (EmailResponse);
+  rpc OrderConfirmationSendEmail (OrderConfirmationEmailRequest) returns (EmailResponse);
+
 }
 
-message EmailRequest {
+message ProductItem {
+  string name = 1;
+  int32 quantity = 2;
+  float price = 3;
+  float total = 4;
+}
+
+message OrderConfirmationEmailRequest {
+  string trace_id = 1;
+  string event_name = 2;
+  string to = 3;
+  repeated ProductItem products = 4;  
+  float total_price = 5;
+  string full_name = 6;
+  string order_id = 7;
+  string customer_phone = 8;
+  string delivery_address = 9;
+  string payment_id = 10;
+  float payment_amount = 11;
+  string payment_method = 12;
+  string payment_status = 13;
+  string order_date = 14;
+}
+
+message RegisterAndForgetPasswordEmailRequest {
   string trace_id = 1;
   string to = 2;
   string event_name = 3;

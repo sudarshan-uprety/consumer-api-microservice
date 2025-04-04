@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+package inventory;
+
+message Product {
+  string product_id = 1;
+  int32 quantity = 2;
+  string size = 3;
+  string color = 4;
+}
+
+message InventoryProducer {
+  string trace_id = 1;
+  string event_name = 2;
+  repeated Product products = 3;
+}
+
+service InventoryService {
+  rpc ProcessEvent (InventoryProducer) returns (ProcessEventResponse);
+}
+
+message ProcessEventResponse {
+  string message = 1;
+  bool success = 2;
+}

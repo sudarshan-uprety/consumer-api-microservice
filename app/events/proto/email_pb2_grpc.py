@@ -34,9 +34,19 @@ class EmailServiceStub(object):
         Args:
             channel: A grpc.Channel.
         """
-        self.SendEmail = channel.unary_unary(
-                '/user.EmailService/SendEmail',
-                request_serializer=email__pb2.EmailRequest.SerializeToString,
+        self.RegisterSendEmail = channel.unary_unary(
+                '/user.EmailService/RegisterSendEmail',
+                request_serializer=email__pb2.RegisterAndForgetPasswordEmailRequest.SerializeToString,
+                response_deserializer=email__pb2.EmailResponse.FromString,
+                _registered_method=True)
+        self.ForgetPasswordSendEmail = channel.unary_unary(
+                '/user.EmailService/ForgetPasswordSendEmail',
+                request_serializer=email__pb2.RegisterAndForgetPasswordEmailRequest.SerializeToString,
+                response_deserializer=email__pb2.EmailResponse.FromString,
+                _registered_method=True)
+        self.OrderConfirmationSendEmail = channel.unary_unary(
+                '/user.EmailService/OrderConfirmationSendEmail',
+                request_serializer=email__pb2.OrderConfirmationEmailRequest.SerializeToString,
                 response_deserializer=email__pb2.EmailResponse.FromString,
                 _registered_method=True)
 
@@ -44,7 +54,19 @@ class EmailServiceStub(object):
 class EmailServiceServicer(object):
     """Missing associated documentation comment in .proto file."""
 
-    def SendEmail(self, request, context):
+    def RegisterSendEmail(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def ForgetPasswordSendEmail(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def OrderConfirmationSendEmail(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -53,9 +75,19 @@ class EmailServiceServicer(object):
 
 def add_EmailServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
-            'SendEmail': grpc.unary_unary_rpc_method_handler(
-                    servicer.SendEmail,
-                    request_deserializer=email__pb2.EmailRequest.FromString,
+            'RegisterSendEmail': grpc.unary_unary_rpc_method_handler(
+                    servicer.RegisterSendEmail,
+                    request_deserializer=email__pb2.RegisterAndForgetPasswordEmailRequest.FromString,
+                    response_serializer=email__pb2.EmailResponse.SerializeToString,
+            ),
+            'ForgetPasswordSendEmail': grpc.unary_unary_rpc_method_handler(
+                    servicer.ForgetPasswordSendEmail,
+                    request_deserializer=email__pb2.RegisterAndForgetPasswordEmailRequest.FromString,
+                    response_serializer=email__pb2.EmailResponse.SerializeToString,
+            ),
+            'OrderConfirmationSendEmail': grpc.unary_unary_rpc_method_handler(
+                    servicer.OrderConfirmationSendEmail,
+                    request_deserializer=email__pb2.OrderConfirmationEmailRequest.FromString,
                     response_serializer=email__pb2.EmailResponse.SerializeToString,
             ),
     }
@@ -70,7 +102,7 @@ class EmailService(object):
     """Missing associated documentation comment in .proto file."""
 
     @staticmethod
-    def SendEmail(request,
+    def RegisterSendEmail(request,
             target,
             options=(),
             channel_credentials=None,
@@ -83,8 +115,62 @@ class EmailService(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/user.EmailService/SendEmail',
-            email__pb2.EmailRequest.SerializeToString,
+            '/user.EmailService/RegisterSendEmail',
+            email__pb2.RegisterAndForgetPasswordEmailRequest.SerializeToString,
+            email__pb2.EmailResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def ForgetPasswordSendEmail(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/user.EmailService/ForgetPasswordSendEmail',
+            email__pb2.RegisterAndForgetPasswordEmailRequest.SerializeToString,
+            email__pb2.EmailResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def OrderConfirmationSendEmail(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/user.EmailService/OrderConfirmationSendEmail',
+            email__pb2.OrderConfirmationEmailRequest.SerializeToString,
             email__pb2.EmailResponse.FromString,
             options,
             channel_credentials,
