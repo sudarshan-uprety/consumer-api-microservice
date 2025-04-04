@@ -1,6 +1,7 @@
 from fastapi import status, APIRouter, BackgroundTasks, Depends
 
 from app.events.producer_functions import email_verification_procedure, forget_password_verification_procedure
+from app.grpc_client import email
 from app.events.schema import RegisterEmailEvent, ForgotPasswordEvent
 from app.user.queries import *
 from app.user.schema import *
@@ -25,8 +26,8 @@ async def signup(user: UserRegister, background_tasks: BackgroundTasks = Backgro
         full_name=user.full_name
     )
     background_tasks.add_task(
-        email_verification_procedure,
-        data=event_data.json(),
+        email.send_verification_email_grpc,
+        data=event_data,
         queue=variables.EMAIL_QUEUE
     )
     data = UserRegisterResponse.from_orm(user)

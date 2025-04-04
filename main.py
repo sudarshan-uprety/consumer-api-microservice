@@ -1,5 +1,4 @@
 import json
-import asyncio
 
 from elasticsearch.exceptions import NotFoundError, AuthorizationException, AuthenticationException
 from fastapi import FastAPI
@@ -9,6 +8,7 @@ from jose.exceptions import JWTError
 from sqlalchemy.exc import OperationalError, PendingRollbackError
 from starlette.middleware.base import BaseHTTPMiddleware
 import grpc
+from grpc.aio import AioRpcError
 
 from app.orders.routers import router as order_router
 from app.payments.routes import router as payment_router
@@ -57,7 +57,7 @@ async def serve_grpc():
 @server.on_event("startup")
 async def startup_event():
     connect_to_database()
-    asyncio.create_task(serve_grpc())
+    # asyncio.create_task(serve_grpc())
 
 
 # Shutdown Events
@@ -160,3 +160,7 @@ async def es_authentication_exception_handler(_, exception):
 async def es_authorization_exception_handler(_, exception):
     rollback_session()
     return response.error(constant.ERROR_FORBIDDEN, "Elasticsearch authorization failed")
+
+@server.exception_handler(exceptions.GRPCError)
+async def grpc_exception_handler(_, exception: exceptions.GRPCError):
+    return response.error(exception.status_code, exception.message)
