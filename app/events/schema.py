@@ -16,7 +16,7 @@ class ReduceQuantityEvent(BaseModel):
     product: list[ProductItem]
 
 
-class RegisterEmailEvent(BaseModel):
+class RegisterAndForgotPasswordEmailEvent(BaseModel):
     trace_id: str
     event_name: str
     to: EmailStr

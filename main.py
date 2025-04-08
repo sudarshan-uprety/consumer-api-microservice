@@ -44,13 +44,13 @@ server = FastAPI(
     docs_url="/api/docs/",
 )
 
-async def serve_grpc():
-    grpc_server  = grpc.aio.server()
-    email_pb2_grpc.add_EmailServiceServicer_to_server(email_grpc.EmailService(), grpc_server)
-    listen_address = "[::]:50051"
-    grpc_server.add_insecure_port(listen_address)
-    await grpc_server.start()
-    await grpc_server.wait_for_termination()
+# async def serve_grpc():
+#     grpc_server  = grpc.aio.server()
+#     email_pb2_grpc.add_EmailServiceServicer_to_server(email_grpc.EmailService(), grpc_server)
+#     listen_address = "[::]:50051"
+#     grpc_server.add_insecure_port(listen_address)
+#     await grpc_server.start()
+#     await grpc_server.wait_for_termination()
 
 
 # Startup Events

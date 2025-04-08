@@ -1,11 +1,11 @@
 import grpc
 
 from app.events.proto import email_pb2_grpc, email_pb2
-from app.events.schema import RegisterEmailEvent
+from app.events.schema import RegisterAndForgotPasswordEmailEvent
 from utils.log import logger, trace_id_var
 
 
-async def send_verification_email_grpc(data: RegisterEmailEvent, queue:str):
+async def send_verification_email_grpc(data: RegisterAndForgotPasswordEmailEvent, queue:str):
     channel = grpc.aio.insecure_channel('localhost:50051')
     stub = email_pb2_grpc.EmailServiceStub(channel)
     request = email_pb2.RegisterAndForgetPasswordEmailRequest(
